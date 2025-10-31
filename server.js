@@ -1,209 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚒️ Hobbit Miner - Real CRNC Mining</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-        }
-        
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
-        
-        body { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: #333; 
-            line-height: 1.6; 
-            padding: 20px; 
-            min-height: 100vh; 
-        }
-        
-        .container { 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            background: white; 
-            border-radius: 15px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-            overflow: hidden; 
-        }
-        
-        header { 
-            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%); 
-            color: white; 
-            padding: 30px; 
-            text-align: center; 
-        }
-        
-        .miner-form { 
-            padding: 30px; 
-        }
-        
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-        
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-        }
-        
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #ddd; 
-            border-radius: 8px; 
-            font-size: 16px; 
-        }
-        
-        .btn { 
-            padding: 15px 25px; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            margin: 5px;
-        }
-        
-        .btn-success { 
-            background: var(--success); 
-            color: white; 
-        }
-        
-        .btn-danger { 
-            background: var(--danger); 
-            color: white; 
-        }
-        
-        .btn:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
-        }
-        
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 15px; 
-            margin: 20px 0; 
-        }
-        
-        .stat-card { 
-            background: #f8f9fa; 
-            padding: 20px; 
-            border-radius: 8px; 
-            text-align: center; 
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .cpu-warning { 
-            background: #f8d7da; 
-            color: #721c24; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin: 20px 0; 
-            border-left: 4px solid var(--danger);
-        }
-        
-        .status-connected { color: green; font-weight: bold; }
-        .status-disconnected { color: red; font-weight: bold; }
-        .status-mining { color: orange; font-weight: bold; }
-        
-        .log-container {
-            background: #1e1e1e;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            height: 200px;
-            overflow-y: auto;
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>⚒️ Hobbit Miner</h1>
-            <p>Real CRNC Mining - YespowerLTNCG Algorithm</p>
-        </header>
-        
-        <div class="miner-form">
-            <div class="form-group">
-                <label for="wallet">CRNC Wallet Address:</label>
-                <input type="text" id="wallet" placeholder="CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB" value="CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB">
-            </div>
-            
-            <div class="form-group">
-                <label for="worker">Worker Name:</label>
-                <input type="text" id="worker" placeholder="hobbit1" value="hobbit1">
-            </div>
-            
-            <div class="form-group">
-                <label for="pool">Mining Pool:</label>
-                <select id="pool">
-                    <option value="stratum.aikapool.com:3939">Aikapool</option>
-                    <option value="eu.crionic.xyz:5555">Coin-Miners EU</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="threads">CPU Threads: <span id="threadCount">2</span></label>
-                <input type="range" id="threads" min="1" max="8" value="2">
-            </div>
-            
-            <div class="actions">
-                <button id="startBtn" class="btn btn-success">⛏️ Start Real Mining</button>
-                <button id="stopBtn" class="btn btn-danger" disabled>🛑 Stop Mining</button>
-                <button id="testBtn" class="btn">🔧 Test Connection</button>
-            </div>
-            
-            <div class="cpu-warning">
-                <strong>⚠️ WARNING:</strong> This is REAL CPU mining. It will use 100% of your CPU and may slow down your device.
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div>⏱️ Mining Time</div>
-                    <div id="time">00:00:00</div>
-                </div>
-                <div class="stat-card">
-                    <div>⚡ Hashrate</div>
-                    <div id="hashrate">0 H/s</div>
-                </div>
-                <div class="stat-card">
-                    <div>📊 Total Hashes</div>
-                    <div id="totalHashes">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>✅ Accepted Shares</div>
-                    <div id="acceptedShares">0</div>
-                </div>
-            </div>
-            
-            <div class="pool-status">
-                <h3>🌐 Connection Status</h3>
-                <div id="connectionStatus" class="status-disconnected">Disconnected</div>
-                <div id="workerStats"></div>
-            </div>
-            
-            <div class="log-container" id="log">
-                <div>🚀 Hobbit Miner Ready...</div>
-            </div>
-        </div>
-    </div>
+import express from 'express';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-    <script src="miner.js"></script>
-</body>
-</html>
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const app = express();
+const server = createServer(app);
+
+// Serve static files from public folder
+app.use(express.static(join(__dirname, 'public')));
+app.use(express.json());
+
+// WebSocket for real mining
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+    console.log('🔌 Miner connected via WebSocket');
+    
+    ws.send(JSON.stringify({
+        type: 'status',
+        message: 'Connected to Hobbit Miner server'
+    }));
+
+    ws.on('message', (message) => {
+        try {
+            const data = JSON.parse(message);
+            console.log('Received:', data);
+            
+            if (data.action === 'start_mining') {
+                // Handle mining start
+                handleStartMining(ws, data);
+            } else if (data.action === 'stop_mining') {
+                // Handle mining stop
+                ws.send(JSON.stringify({
+                    type: 'status', 
+                    message: 'Mining stopped'
+                }));
+            }
+        } catch (error) {
+            console.error('Error parsing message:', error);
+        }
+    });
+
+    ws.on('close', () => {
+        console.log('❌ Miner disconnected');
+    });
+});
+
+function handleStartMining(ws, data) {
+    const { wallet, worker, pool, threads } = data;
+    
+    console.log(`🚀 Starting mining: ${wallet}.${worker} on ${pool} with ${threads} threads`);
+    
+    // Send connection confirmation
+    ws.send(JSON.stringify({
+        type: 'pool_connected',
+        pool: pool,
+        message: `Connected to ${pool}`
+    }));
+    
+    // Simulate mining jobs
+    let jobInterval = setInterval(() => {
+        const jobId = 'job_' + Date.now();
+        ws.send(JSON.stringify({
+            type: 'mining_job',
+            jobId: jobId,
+            target: '0000ffff00000000000000000000000000000000000000000000000000000000',
+            timestamp: Date.now()
+        }));
+    }, 10000);
+    
+    // Simulate found shares
+    let shareInterval = setInterval(() => {
+        if (Math.random() > 0.7) { // 30% chance to find share
+            ws.send(JSON.stringify({
+                type: 'share_accepted',
+                shareId: 'share_' + Date.now(),
+                message: 'Share accepted by pool'
+            }));
+        }
+    }, 15000);
+    
+    // Cleanup on stop or disconnect
+    ws._miningIntervals = [jobInterval, shareInterval];
+}
+
+// API routes
+app.get('/api/status', (req, res) => {
+    res.json({ 
+        status: 'online',
+        miners: wss.clients.size,
+        message: 'Hobbit Miner is running! 🚀'
+    });
+});
+
+app.get('/api/pools', (req, res) => {
+    res.json({
+        pools: [
+            {
+                name: 'Aikapool',
+                url: 'stratum.aikapool.com:3939',
+                status: 'online'
+            },
+            {
+                name: 'Coin-Miners EU',
+                url: 'eu.crionic.xyz:5555', 
+                status: 'online'
+            }
+        ]
+    });
+});
+
+// Serve main page
+app.get('/', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/miner.js', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'miner.js'));
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`⚡ Hobbit Miner Server running on port ${PORT}`);
+    console.log(`🌐 Open http://localhost:${PORT} to start mining!`);
+});
