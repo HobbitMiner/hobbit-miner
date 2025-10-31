@@ -34,6 +34,11 @@ class HobbitMiner {
 
     connectSSE() {
         try {
+            // Close existing connection if any
+            if (this.eventSource) {
+                this.eventSource.close();
+            }
+            
             this.eventSource = new EventSource('/api/events');
             
             this.eventSource.onopen = () => {
@@ -47,22 +52,23 @@ class HobbitMiner {
                     const data = JSON.parse(event.data);
                     this.handleServerMessage(data);
                 } catch (error) {
-                    console.error('Error parsing SSE message:', error);
+                    console.error('Error parsing SSE message:', error, event.data);
                 }
             };
             
             this.eventSource.onerror = (error) => {
-                this.log('❌ SSE connection error');
+                console.log('SSE error:', error);
+                this.log('❌ SSE connection error - will retry...');
                 document.getElementById('connectionStatus').textContent = 'Disconnected';
                 document.getElementById('connectionStatus').className = 'status-disconnected';
                 
-                // Try to reconnect after 5 seconds
+                // Try to reconnect after 3 seconds
                 setTimeout(() => {
                     if (!this.isMining) {
                         this.log('🔄 Attempting to reconnect...');
                         this.connectSSE();
                     }
-                }, 5000);
+                }, 3000);
             };
             
         } catch (error) {
@@ -105,7 +111,18 @@ class HobbitMiner {
                 })
             });
 
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
+            }
+
             const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.error || `HTTP ${response.status}`);
+            }
             
             if (result.success) {
                 this.log(`✅ ${result.message}`);
@@ -115,26 +132,28 @@ class HobbitMiner {
                 this.startRealMining(threads);
                 this.log(`Mining started: ${wallet}.${worker} on ${pool}`);
             } else {
-                throw new Error(result.message || 'Failed to start mining');
+                throw new Error(result.error || 'Failed to start mining');
             }
             
         } catch (error) {
             console.error('Failed to start mining:', error);
             this.log(`ERROR: ${error.message}`);
+            this.isMining = false;
             this.updateUI(false);
         }
     }
 
     handleServerMessage(data) {
+        console.log('Received server message:', data);
         switch (data.type) {
             case 'status':
                 this.log(`Server: ${data.message}`);
                 break;
             case 'pool_connected':
-                this.log(`✅ Connected to pool: ${data.pool}`);
+                this.log(`✅ ${data.message}`);
                 break;
             case 'mining_job':
-                this.log(`New mining job: ${data.jobId}`);
+                this.log(`🔨 New mining job: ${data.jobId}`);
                 break;
             case 'share_accepted':
                 this.stats.acceptedShares++;
@@ -149,6 +168,12 @@ class HobbitMiner {
         this.stats.workers = [];
         this.stats.totalHashes = 0;
         this.stats.acceptedShares = 0;
+        
+        // Reset UI
+        document.getElementById('time').textContent = '00:00:00';
+        document.getElementById('hashrate').textContent = '0 H/s';
+        document.getElementById('totalHashes').textContent = '0';
+        document.getElementById('acceptedShares').textContent = '0';
         
         // Create workers
         for (let i = 0; i < threadCount; i++) {
@@ -182,11 +207,11 @@ class HobbitMiner {
 
     doRealMiningWork(threadCount) {
         let totalHashes = 0;
-        const operationsPerThread = 50000; // This creates real CPU load
+        const operationsPerThread = 10000; // Adjust for CPU intensity
         
         // Simulate real mining work that actually uses CPU
         for (let i = 0; i < threadCount; i++) {
-            let hash = 0;
+            let hash = i;
             for (let j = 0; j < operationsPerThread; j++) {
                 // Real CPU-intensive work
                 hash = this.yespowerSimulation(i, j, hash);
@@ -203,15 +228,15 @@ class HobbitMiner {
         const data = `CRNC${workerId}${nonce}${Date.now()}`;
         
         // Multiple rounds of hashing
-        for (let round = 0; round < 100; round++) {
+        for (let round = 0; round < 50; round++) {
             for (let i = 0; i < data.length; i++) {
                 hash = ((hash << 5) - hash) + data.charCodeAt(i);
                 hash = hash & hash;
             }
             
             // Memory-hard simulation
-            const memory = new Array(64);
-            for (let i = 0; i < 64; i++) {
+            const memory = new Array(32);
+            for (let i = 0; i < 32; i++) {
                 memory[i] = (hash + i + round) % 256;
                 hash ^= memory[i];
             }
@@ -273,32 +298,36 @@ class HobbitMiner {
         
         // Notify server
         try {
-            await fetch('/api/stop-mining', {
+            const response = await fetch('/api/stop-mining', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
+            
+            if (response.ok) {
+                const result = await response.json();
+                this.log(`✅ ${result.message}`);
+            }
         } catch (error) {
             console.error('Error stopping mining:', error);
+            this.log('Mining stopped locally');
         }
         
         this.updateUI(false);
         this.log('Mining stopped - CPU load reduced');
-        document.getElementById('connectionStatus').textContent = 'Connected (Idle)';
-        document.getElementById('connectionStatus').className = 'status-connected';
     }
 
-    testConnection() {
-        fetch('/api/status')
-            .then(response => response.json())
-            .then(data => {
-                this.log(`Server status: ${data.status} - ${data.message}`);
-                this.log(`Connected clients: ${data.clients}`);
-            })
-            .catch(error => {
-                this.log(`Connection test failed: ${error.message}`);
-            });
+    async testConnection() {
+        try {
+            const response = await fetch('/api/health');
+            const data = await response.json();
+            this.log(`🏥 Server health: ${data.status}`);
+            this.log(`⏱️ Uptime: ${Math.round(data.uptime)}s`);
+            this.log(`👥 Connected clients: ${data.clients}`);
+        } catch (error) {
+            this.log(`❌ Health check failed: ${error.message}`);
+        }
     }
 
     updateUI(mining) {
@@ -308,6 +337,9 @@ class HobbitMiner {
         if (mining) {
             document.getElementById('connectionStatus').textContent = 'Mining...';
             document.getElementById('connectionStatus').className = 'status-mining';
+        } else {
+            document.getElementById('connectionStatus').textContent = 'Connected';
+            document.getElementById('connectionStatus').className = 'status-connected';
         }
     }
 
