@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobbit Miner - Real CRNC Mining</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚒️ Hobbit Miner</h1>
+            <p>Real CPU Mining for CRNC (yespowerltncg)</p>
+        </header>
+        
+        <div class="miner-form">
+            <div class="form-group">
+                <label for="wallet">CRNC Wallet Address:</label>
+                <input type="text" id="wallet" placeholder="CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB" value="">
+                <small>Example: CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="worker">Worker Name:</label>
+                <input type="text" id="worker" placeholder="hobbit1" value="hobbit1">
+            </div>
+            
+            <div class="form-group">
+                <label for="pool">Mining Pool:</label>
+                <select id="pool">
+                    <option value="stratum.aikapool.com:3939">Aikapool - stratum.aikapool.com:3939</option>
+                    <option value="eu.crionic.xyz:5555">Coin-Miners EU - eu.crionic.xyz:5555</option>
+                    <option value="crn.cryptoverse.mining:5555">Cryptoverse - crn.cryptoverse.mining:5555</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="threads">CPU Threads: <span id="threadCount">2</span></label>
+                <input type="range" id="threads" min="1" max="8" value="2">
+                <small>Recommended: 2 threads for optimal performance</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="intensity">Mining Intensity: <span id="intensityValue">85%</span></label>
+                <input type="range" id="intensity" min="10" max="100" value="85">
+                <small>Lower intensity = less CPU usage</small>
+            </div>
+            
+            <div class="actions">
+                <button id="startBtn" class="btn btn-success">⛏️ Start Real Mining</button>
+                <button id="stopBtn" class="btn btn-danger" disabled>⏹️ Stop Mining</button>
+                <button id="qrBtn" class="btn btn-secondary">📱 Show QR Code</button>
+            </div>
+            
+            <div class="cpu-warning">
+                <h3>⚠️ WARNING: REAL CPU MINING</h3>
+                <p>This miner uses 100% of your CPU cores and will:</p>
+                <ul>
+                    <li>Significantly increase power consumption</li>
+                    <li>Generate heat and may slow down your device</li>
+                    <li>Reduce battery life on mobile devices</li>
+                </ul>
+                <p>Use responsibly and monitor device temperature!</p>
+            </div>
+            
+            <div class="mining-stats">
+                <h3>📊 Mining Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Mining Time</div>
+                        <div class="stat-value" id="time">00:00:00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Hashrate</div>
+                        <div class="stat-value" id="hashrate">0 H/s</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Hashes</div>
+                        <div class="stat-value" id="totalHashes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accepted Shares</div>
+                        <div class="stat-value" id="acceptedShares">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Rejected Shares</div>
+                        <div class="stat-value" id="rejectedShares">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">CPU Usage</div>
+                        <div class="stat-value" id="cpuUsage">0%</div>
+                    </div>
+                </div>
+                
+                <div class="pool-info">
+                    <h4>🌐 Pool Connection</h4>
+                    <div class="pool-status">
+                        <span class="status-indicator" id="poolStatusIndicator"></span>
+                        <span id="poolStatusText">Disconnected</span>
+                        <span id="poolLatency" class="latency">Latency: N/A</span>
+                    </div>
+                    <div class="mining-log" id="miningLog">
+                        <div>🟢 Ready to start mining...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="donation-notice">
+                <p>💝 This miner includes a 1% developer donation to support maintenance. Thank you!</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Hobbit Miner v1.0 &copy; 2024 | Algorithm: yespowerltncg</p>
+        </footer>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>📱 Your CRNC Wallet QR Code</h3>
+            <div id="qrCode"></div>
+            <p id="walletAddress"></p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="miner.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
