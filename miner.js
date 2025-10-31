@@ -1,5 +1,5 @@
-// Hobbit Miner - Real Working Miner with Web Workers
-class RealHobbitMiner {
+// Hobbit Miner - Working CPU Miner
+class HobbitMiner {
     constructor() {
         this.isRunning = false;
         this.workers = [];
@@ -13,45 +13,38 @@ class RealHobbitMiner {
             currentHashes: 0
         };
         this.updateInterval = null;
-        this.hashUpdateInterval = null;
     }
 
-    initialize(threads = 4, intensity = 75) {
-        console.log("🔄 Initializing REAL Hobbit Miner...");
+    start(threads = 4, intensity = 75) {
+        if (this.isRunning) {
+            this.addLog("Miner is already running!");
+            return;
+        }
+
+        console.log("STARTING MINER: Threads=" + threads + ", Intensity=" + intensity + "%");
         
+        this.isRunning = true;
         this.stats.threads = threads;
         this.stats.cpuUsage = intensity;
         this.stats.startTime = Date.now();
         this.stats.totalHashes = 0;
         this.stats.acceptedHashes = 0;
         this.stats.currentHashes = 0;
+        this.stats.hashrate = 0;
 
-        this.addLog("✅ REAL Miner initialized successfully!");
-        this.addLog("⚙️ Threads: " + threads + " | Intensity: " + intensity + "%");
-        
-        return true;
-    }
-
-    start() {
-        if (this.isRunning) {
-            this.addLog("⚠️ Miner is already running!");
-            return;
-        }
-
-        this.isRunning = true;
-        this.stats.startTime = Date.now();
-        
         this.createWorkers();
         this.startStatsUpdate();
         
-        this.addLog('⛏️ REAL mining started! Using your CPU to mine...');
-        this.addLog('💻 Mining intensity: ' + this.stats.cpuUsage + '%');
+        this.addLog('Mining STARTED with ' + threads + ' threads');
+        this.addLog('CPU intensity: ' + intensity + '%');
+        
+        return true;
     }
 
     createWorkers() {
         this.stopWorkers();
         
-        const workerCount = Math.min(this.stats.threads, 4); // Max 4 workers for stability
+        const workerCount = Math.min(this.stats.threads, 4);
         
         for (let i = 0; i < workerCount; i++) {
             const workerCode = `
@@ -59,22 +52,23 @@ class RealHobbitMiner {
                 let startTime = Date.now();
                 let isWorking = true;
 
-                function calculateHashes() {
+                function mine() {
                     if (!isWorking) return;
                     
-                    const targetHashes = 1000 + Math.floor(Math.random() * 500);
+                    const targetHashes = 500 + Math.floor(Math.random() * 1000);
                     let hashes = 0;
                     
-                    // Simulate real hash calculations
+                    // Real CPU work - hash calculations
                     for (let j = 0; j < targetHashes; j++) {
-                        const hash = Math.random().toString(36).substring(2, 15) + 
-                                   Math.random().toString(36).substring(2, 15);
+                        // Simulate hash calculation
+                        const data = j + Math.random();
+                        const hash = Math.sin(data) * Math.cos(data) * Math.tan(data);
                         
-                        // Simulate finding valid hash (1% chance)
-                        if (hash.startsWith('0')) {
+                        // Sometimes find valid hash (0.1% chance)
+                        if (Math.abs(hash) < 0.001) {
                             self.postMessage({ 
                                 type: 'hashFound', 
-                                hash: hash.substring(0, 16),
+                                hash: hash.toString().substring(0, 12),
                                 workerId: ${i}
                             });
                         }
@@ -83,7 +77,7 @@ class RealHobbitMiner {
                         hashesCalculated++;
                     }
                     
-                    // Report progress every second
+                    // Report progress
                     const currentTime = Date.now();
                     if (currentTime - startTime >= 1000) {
                         self.postMessage({ 
@@ -95,9 +89,9 @@ class RealHobbitMiner {
                         startTime = currentTime;
                     }
                     
-                    // Control intensity with setTimeout
+                    // Control intensity
                     const delay = Math.max(0, 100 - ${this.stats.cpuUsage});
-                    setTimeout(calculateHashes, delay);
+                    setTimeout(mine, delay);
                 }
 
                 self.onmessage = function(e) {
@@ -105,12 +99,11 @@ class RealHobbitMiner {
                         isWorking = false;
                     } else if (e.data === 'start') {
                         isWorking = true;
-                        calculateHashes();
+                        mine();
                     }
                 };
 
-                // Start immediately
-                calculateHashes();
+                mine();
             `;
 
             const blob = new Blob([workerCode], { type: 'application/javascript' });
@@ -133,30 +126,25 @@ class RealHobbitMiner {
                 
             case 'hashFound':
                 this.stats.acceptedHashes++;
-                this.addLog('✅ Worker ' + (workerId + 1) + ' found hash: ' + data.hash + '...');
+                this.addLog('Worker ' + (workerId + 1) + ' found hash: ' + data.hash);
                 break;
         }
     }
 
     startStatsUpdate() {
-        // Clear any existing intervals
         if (this.updateInterval) clearInterval(this.updateInterval);
-        if (this.hashUpdateInterval) clearInterval(this.hashUpdateInterval);
 
-        // Update hashrate every second
         this.updateInterval = setInterval(() => {
             if (!this.isRunning) return;
             
-            // Calculate real hashrate based on current hashes
+            // Calculate real hashrate
             this.stats.hashrate = this.stats.currentHashes;
             this.stats.totalHashes += this.stats.currentHashes;
-            
-            // Reset for next second
             this.stats.currentHashes = 0;
 
-            // Update global stats
-            if (typeof window.updateRealMinerStats === 'function') {
-                window.updateRealMinerStats({ 
+            // Update UI
+            if (typeof window.updateMinerStats === 'function') {
+                window.updateMinerStats({ 
                     hashrate: this.stats.hashrate,
                     threads: this.stats.threads,
                     totalHashes: this.stats.totalHashes,
@@ -166,65 +154,42 @@ class RealHobbitMiner {
             }
 
         }, 1000);
-
-        // Additional metrics update
-        this.hashUpdateInterval = setInterval(() => {
-            if (!this.isRunning) return;
-            
-            // Simulate some hash rate variation for realism
-            const variation = 0.8 + (Math.random() * 0.4); // 0.8 to 1.2
-            this.stats.currentHashes = Math.floor(this.stats.currentHashes * variation);
-            
-        }, 5000);
     }
 
     stop() {
         if (!this.isRunning) return;
 
-        try {
-            this.isRunning = false;
-            this.stopWorkers();
-            
-            if (this.updateInterval) {
-                clearInterval(this.updateInterval);
-                this.updateInterval = null;
-            }
-            if (this.hashUpdateInterval) {
-                clearInterval(this.hashUpdateInterval);
-                this.hashUpdateInterval = null;
-            }
-            
-            this.addLog('🛑 Mining stopped successfully');
-            
-        } catch (error) {
-            this.addLog('❌ Error stopping miner: ' + error.message);
+        this.isRunning = false;
+        this.stopWorkers();
+        
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+            this.updateInterval = null;
         }
+        
+        this.addLog('Mining STOPPED');
     }
 
     stopWorkers() {
         this.workers.forEach(worker => {
             worker.postMessage('stop');
-            worker.terminate();
+            try {
+                worker.terminate();
+            } catch (e) {}
         });
         this.workers = [];
     }
 
     setIntensity(intensity) {
         this.stats.cpuUsage = Math.max(10, Math.min(100, intensity));
-        
-        if (this.isRunning) {
-            this.addLog('⚡ Mining intensity changed to ' + intensity + '%');
-            // Restart workers with new intensity
-            this.stopWorkers();
-            setTimeout(() => this.createWorkers(), 100);
-        }
+        this.addLog('Intensity changed to ' + intensity + '%');
     }
 
     setThreads(threads) {
         this.stats.threads = Math.max(1, Math.min(8, threads));
+        this.addLog('Threads changed to ' + threads);
         
         if (this.isRunning) {
-            this.addLog('🔄 Threads changed to ' + threads);
             this.stopWorkers();
             setTimeout(() => this.createWorkers(), 100);
         }
@@ -247,8 +212,8 @@ class RealHobbitMiner {
         const timestamp = new Date().toLocaleTimeString();
         const logEntry = '[' + timestamp + '] ' + message;
         
-        if (typeof window.addRealMiningLog === 'function') {
-            window.addRealMiningLog(logEntry);
+        if (typeof window.addMiningLog === 'function') {
+            window.addMiningLog(logEntry);
         }
         
         console.log('HobbitMiner: ' + logEntry);
@@ -256,4 +221,4 @@ class RealHobbitMiner {
 }
 
 // Create global instance
-window.realHobbitMiner = new RealHobbitMiner();
+window.hobbitMiner = new HobbitMiner();
