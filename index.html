@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobbit Miner - Browser Cryptocurrency Mining</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="title">Hobbit Miner</h1>
+            <div class="language-selector">
+                <button id="lang-en" class="lang-btn active">EN</button>
+                <button id="lang-sk" class="lang-btn">SK</button>
+                <button id="lang-ru" class="lang-btn">RU</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="mining-controls">
+                <div class="crypto-selector">
+                    <label id="crypto-label" for="crypto-select">Select Cryptocurrency:</label>
+                    <select id="crypto-select">
+                        <option value="monero">Monero (XMR)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="litecoin">Litecoin (LTC)</option>
+                    </select>
+                </div>
+
+                <div class="thread-control">
+                    <label id="thread-label">CPU Threads: <span id="thread-value">4</span></label>
+                    <input type="range" id="thread-slider" min="1" max="8" value="4" class="slider">
+                </div>
+
+                <div class="pool-settings">
+                    <label id="pool-label" for="pool-input">Mining Pool:</label>
+                    <input type="text" id="pool-input" value="pool.minexmr.com:4444" placeholder="pool.minexmr.com:4444">
+                </div>
+
+                <div class="wallet-settings">
+                    <label id="wallet-label" for="wallet-input">Wallet Address:</label>
+                    <input type="text" id="wallet-input" placeholder="Your wallet address">
+                </div>
+
+                <div class="action-buttons">
+                    <button id="start-btn" class="btn btn-primary">Start Mining</button>
+                    <button id="stop-btn" class="btn btn-secondary" disabled>Stop Mining</button>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3 id="hashrate-title">Hashrate</h3>
+                    <p id="hashrate-value">0 H/s</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="threads-title">Active Threads</h3>
+                    <p id="threads-value">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="mined-title">Total Mined</h3>
+                    <p id="mined-value">0</p>
+                </div>
+            </div>
+
+            <div class="status-container">
+                <h3 id="status-title">Mining Status</h3>
+                <p id="status-text" class="status-idle">Ready to start mining</p>
+            </div>
+        </main>
+
+        <footer>
+            <p id="footer-text">Hobbit Miner - Open Source Browser Mining Tool</p>
+        </footer>
+    </div>
+
+    <!-- WebAssembly Mining Script -->
+    <script src="miner.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
