@@ -1,4 +1,4 @@
-class RealHobbitMinerApp {
+class HobbitMinerApp {
     constructor() {
         this.currentLanguage = 'en';
         this.isMining = false;
@@ -15,82 +15,67 @@ class RealHobbitMinerApp {
         this.translations = {
             en: {
                 title: "Hobbit Miner",
-                cryptoLabel: "Select Cryptocurrency:",
+                cryptoLabel: "Cryptocurrency:",
                 threadLabel: "CPU Threads:",
                 intensityLabel: "Mining Intensity:",
-                walletLabel: "Your XMR Wallet Address:",
-                startBtn: "Start Real Mining",
-                stopBtn: "Stop Mining",
-                resetBtn: "Reset Stats",
+                startBtn: "START MINING",
+                stopBtn: "STOP MINING",
+                resetBtn: "RESET",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Active Threads",
                 minedTitle: "Total Hashes",
                 cpuTitle: "CPU Usage",
                 statusTitle: "Mining Status",
-                statusIdle: "Ready to start real mining",
-                statusMining: "Real mining in progress...",
-                statusError: "Mining error occurred",
-                footerText: "Hobbit Miner - Real Browser Mining | Open Source | No Data Collection",
-                walletWarning: "Please enter your Monero wallet address",
-                walletHelp: "We'll use a demo wallet for testing",
-                performanceTitle: "Performance Metrics"
+                statusIdle: "Ready to start mining",
+                statusMining: "Mining in progress...",
+                footerText: "Hobbit Miner - CPU Mining | Open Source"
             },
             sk: {
                 title: "Hobbit Miner",
-                cryptoLabel: "Vyberte kryptomenu:",
+                cryptoLabel: "Kryptomena:",
                 threadLabel: "CPU Vlákna:",
                 intensityLabel: "Intenzita ťažby:",
-                walletLabel: "Vaša XMR adresa peňaženky:",
-                startBtn: "Spustiť reálnu ťažbu",
-                stopBtn: "Zastaviť ťažbu",
-                resetBtn: "Resetovať štatistiky",
+                startBtn: "SPUSTIŤ ŤAŽBU",
+                stopBtn: "ZASTAVIŤ ŤAŽBU",
+                resetBtn: "RESET",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Aktívne vlákna",
                 minedTitle: "Celkový počet hashov",
                 cpuTitle: "Využitie CPU",
                 statusTitle: "Stav ťažby",
-                statusIdle: "Pripravené na reálnu ťažbu",
-                statusMining: "Prebieha reálna ťažba...",
-                statusError: "Nastala chyba pri ťažbe",
-                footerText: "Hobbit Miner - Reálna webová ťažba | Open Source | Žiadne zbieranie údajov",
-                walletWarning: "Zadajte adresu svojej Monero peňaženky",
-                walletHelp: "Použijeme demo peňaženku na testovanie",
-                performanceTitle: "Metriky výkonu"
+                statusIdle: "Pripravené na ťažbu",
+                statusMining: "Prebieha ťažba...",
+                footerText: "Hobbit Miner - CPU Ťažba | Open Source"
             },
             ru: {
                 title: "Hobbit Miner",
-                cryptoLabel: "Выберите криптовалюту:",
+                cryptoLabel: "Криптовалюта:",
                 threadLabel: "Потоки CPU:",
                 intensityLabel: "Интенсивность майнинга:",
-                walletLabel: "Адрес вашего XMR кошелька:",
-                startBtn: "Начать реальный майнинг",
-                stopBtn: "Остановить майнинг",
-                resetBtn: "Сбросить статистику",
+                startBtn: "НАЧАТЬ МАЙНИНГ",
+                stopBtn: "ОСТАНОВИТЬ МАЙНИНГ",
+                resetBtn: "СБРОС",
                 hashrateTitle: "Хешрейт",
                 threadsTitle: "Активные потоки",
                 minedTitle: "Всего хешей",
                 cpuTitle: "Использование CPU",
                 statusTitle: "Статус майнинга",
-                statusIdle: "Готов к началу реального майнинга",
-                statusMining: "Реальный майнинг в процессе...",
-                statusError: "Произошла ошибка майнинга",
-                footerText: "Hobbit Miner - Реальный браузерный майнинг | Открытый исходный код | Сбор данных отсутствует",
-                walletWarning: "Введите адрес вашего Monero кошелька",
-                walletHelp: "Мы используем демо-кошелек для тестирования",
-                performanceTitle: "Метрики производительности"
+                statusIdle: "Готов к майнингу",
+                statusMining: "Майнинг в процессе...",
+                footerText: "Hobbit Miner - CPU Майнинг | Открытый код"
             }
         };
     }
 
     init() {
-        console.log("Initializing Hobbit Miner App...");
+        console.log("Starting Hobbit Miner...");
         this.cacheDomElements();
         this.initLanguage();
         this.initEventListeners();
         this.initMinerConnection();
         this.updateDisplay();
         
-        this.addLog("Hobbit Miner App initialized successfully!");
+        this.addLog("Hobbit Miner ready!");
     }
 
     cacheDomElements() {
@@ -99,7 +84,6 @@ class RealHobbitMinerApp {
             cryptoLabel: document.getElementById('crypto-label'),
             threadLabel: document.getElementById('thread-label'),
             intensityLabel: document.getElementById('intensity-label'),
-            walletLabel: document.getElementById('wallet-label'),
             startBtn: document.getElementById('start-btn'),
             stopBtn: document.getElementById('stop-btn'),
             resetBtn: document.getElementById('reset-btn'),
@@ -110,7 +94,6 @@ class RealHobbitMinerApp {
             statusTitle: document.getElementById('status-title'),
             statusText: document.getElementById('status-text'),
             footerText: document.getElementById('footer-text'),
-            walletHelp: document.getElementById('wallet-help'),
             threadValue: document.getElementById('thread-value'),
             intensityValue: document.getElementById('intensity-value'),
             hashrateValue: document.getElementById('hashrate-value'),
@@ -119,8 +102,6 @@ class RealHobbitMinerApp {
             cpuValue: document.getElementById('cpu-value'),
             threadSlider: document.getElementById('thread-slider'),
             intensitySlider: document.getElementById('intensity-slider'),
-            walletInput: document.getElementById('wallet-input'),
-            cryptoSelect: document.getElementById('crypto-select'),
             progressFill: document.getElementById('progress-fill'),
             miningLog: document.getElementById('mining-log'),
             hpsValue: document.getElementById('hps-value'),
@@ -168,7 +149,6 @@ class RealHobbitMinerApp {
         this.elements.cryptoLabel.textContent = t.cryptoLabel;
         this.elements.threadLabel.textContent = t.threadLabel;
         this.elements.intensityLabel.textContent = t.intensityLabel;
-        this.elements.walletLabel.textContent = t.walletLabel;
         this.elements.startBtn.textContent = t.startBtn;
         this.elements.stopBtn.textContent = t.stopBtn;
         this.elements.resetBtn.textContent = t.resetBtn;
@@ -178,9 +158,6 @@ class RealHobbitMinerApp {
         this.elements.cpuTitle.textContent = t.cpuTitle;
         this.elements.statusTitle.textContent = t.statusTitle;
         this.elements.footerText.textContent = t.footerText;
-        this.elements.walletHelp.textContent = t.walletHelp;
-        
-        document.querySelector('.performance-container h3').textContent = t.performanceTitle;
         
         if (!this.isMining) {
             this.elements.statusText.textContent = t.statusIdle;
@@ -189,83 +166,80 @@ class RealHobbitMinerApp {
     }
 
     initEventListeners() {
+        // Thread slider
         this.elements.threadSlider.addEventListener('input', (e) => {
             const threads = parseInt(e.target.value);
             this.elements.threadValue.textContent = threads;
             this.miningStats.threads = threads;
-            if (window.realHobbitMiner) {
-                window.realHobbitMiner.setThreads(threads);
+            if (window.hobbitMiner) {
+                window.hobbitMiner.setThreads(threads);
             }
         });
         
+        // Intensity slider
         this.elements.intensitySlider.addEventListener('input', (e) => {
             const intensity = parseInt(e.target.value);
             this.elements.intensityValue.textContent = intensity;
             this.miningStats.cpuUsage = intensity;
-            if (window.realHobbitMiner) {
-                window.realHobbitMiner.setIntensity(intensity);
+            if (window.hobbitMiner) {
+                window.hobbitMiner.setIntensity(intensity);
             }
         });
         
+        // START MINING button - FIXED!
         this.elements.startBtn.addEventListener('click', () => {
-            console.log("Start button clicked!");
-            this.startRealMining();
+            console.log("START MINING clicked!");
+            this.startMining();
         });
         
+        // STOP MINING button
         this.elements.stopBtn.addEventListener('click', () => {
-            console.log("Stop button clicked!");
-            this.stopRealMining();
+            console.log("STOP MINING clicked!");
+            this.stopMining();
         });
         
+        // RESET button
         this.elements.resetBtn.addEventListener('click', () => {
             this.resetStats();
         });
     }
 
     initMinerConnection() {
-        window.updateRealMinerStats = (stats) => this.updateRealMinerStats(stats);
-        window.addRealMiningLog = (message) => this.addRealMiningLog(message);
-        
-        this.addLog("Miner connection initialized");
+        window.updateMinerStats = (stats) => this.updateMinerStats(stats);
+        window.addMiningLog = (message) => this.addMiningLog(message);
     }
 
-    startRealMining() {
-        console.log("Starting REAL mining process...");
+    startMining() {
+        console.log("Starting mining...");
         
         const threads = parseInt(this.elements.threadSlider.value);
         const intensity = parseInt(this.elements.intensitySlider.value);
 
-        this.addLog("Initializing miner with " + threads + " threads at " + intensity + "% intensity...");
+        this.addLog("Starting with " + threads + " threads at " + intensity + "%");
 
         try {
-            const success = window.realHobbitMiner.initialize(threads, intensity);
+            const success = window.hobbitMiner.start(threads, intensity);
             
             if (success) {
-                window.realHobbitMiner.start();
                 this.isMining = true;
-                
                 this.elements.startBtn.disabled = true;
                 this.elements.stopBtn.disabled = false;
                 this.elements.statusText.textContent = this.translations[this.currentLanguage].statusMining;
                 this.elements.statusText.className = 'status-text status-mining';
                 
                 this.addLog("Mining started successfully!");
-                
-            } else {
-                this.addLog("Failed to initialize miner!");
             }
             
         } catch (error) {
             this.addLog("Error: " + error.message);
-            console.error("Start Mining Error:", error);
         }
     }
 
-    stopRealMining() {
+    stopMining() {
         console.log("Stopping mining...");
         
-        if (window.realHobbitMiner) {
-            window.realHobbitMiner.stop();
+        if (window.hobbitMiner) {
+            window.hobbitMiner.stop();
         }
         
         this.isMining = false;
@@ -291,12 +265,11 @@ class RealHobbitMinerApp {
         this.addLog("Statistics reset");
     }
 
-    updateRealMinerStats(stats) {
+    updateMinerStats(stats) {
         this.miningStats = { ...this.miningStats, ...stats };
         
-        // Get additional stats from miner
-        if (window.realHobbitMiner) {
-            const minerStats = window.realHobbitMiner.getStats();
+        if (window.hobbitMiner) {
+            const minerStats = window.hobbitMiner.getStats();
             this.miningStats.miningTime = minerStats.miningTime;
             this.miningStats.efficiency = minerStats.efficiency;
         }
@@ -305,16 +278,13 @@ class RealHobbitMinerApp {
     }
 
     updateDisplay() {
-        // Update main statistics
         this.elements.hashrateValue.textContent = this.miningStats.hashrate.toLocaleString() + " H/s";
         this.elements.threadsValue.textContent = this.miningStats.threads;
         this.elements.minedValue.textContent = this.miningStats.totalHashes.toLocaleString();
         this.elements.cpuValue.textContent = this.miningStats.cpuUsage + "%";
         
-        // Update progress bar
         this.elements.progressFill.style.width = this.miningStats.cpuUsage + "%";
         
-        // Update performance metrics
         this.elements.hpsValue.textContent = this.miningStats.hashrate.toLocaleString();
         this.elements.sharesValue.textContent = this.miningStats.acceptedHashes;
         this.elements.timeValue.textContent = this.miningStats.miningTime;
@@ -328,13 +298,11 @@ class RealHobbitMinerApp {
         
         this.elements.miningLog.appendChild(logEntry);
         this.elements.miningLog.scrollTop = this.elements.miningLog.scrollHeight;
-        
-        console.log("HobbitMiner UI: " + message);
     }
 }
 
+// Start the app when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded, starting Hobbit Miner...");
-    window.realHobbitMinerApp = new RealHobbitMinerApp();
-    window.realHobbitMinerApp.init();
+    window.hobbitMinerApp = new HobbitMinerApp();
+    window.hobbitMinerApp.init();
 });
