@@ -22,16 +22,16 @@
                 <div class="pool-selector">
                     <label id="pool-label" for="pool-select">Mining Pool:</label>
                     <select id="pool-select">
-                        <option value="coin-miners.info">coin-miners.info:6234</option>
-                        <option value="aikapool.com">aikapool.com:6234</option>
-                        <option value="zpool.ca">zpool.ca:6234</option>
-                        <option value="mining4people.com">mining4people.com:6234</option>
+                        <option value="coin-miners.info:6234">coin-miners.info:6234</option>
+                        <option value="aikapool.com:6234">aikapool.com:6234</option>
+                        <option value="zpool.ca:6234">zpool.ca:6234</option>
+                        <option value="mining4people.com:6234">mining4people.com:6234</option>
                     </select>
                 </div>
 
                 <div class="wallet-settings">
                     <label id="wallet-label" for="wallet-input">Crionic Wallet:</label>
-                    <input type="text" id="wallet-input" placeholder="CX... your Crionic address">
+                    <input type="text" id="wallet-input" placeholder="CX... your Crionic address" value="CXexample1234567890CrionicWallet">
                     <small id="wallet-help">Algorithm: yespowerLTNCG | Port: 6234</small>
                 </div>
 
@@ -48,7 +48,7 @@
                 <div class="action-buttons">
                     <button id="start-btn" class="btn btn-primary">⛏️ START MINING</button>
                     <button id="stop-btn" class="btn btn-secondary" disabled>🛑 STOP MINING</button>
-                    <button id="stats-btn" class="btn btn-success">📊 POOL STATS</button>
+                    <button id="reset-btn" class="btn btn-success">🔄 RESET</button>
                 </div>
             </div>
 
@@ -71,11 +71,19 @@
                 </div>
             </div>
 
+            <div class="status-container">
+                <h3 id="status-title">Mining Status</h3>
+                <p id="status-text" class="status-idle">✅ Ready to mine Crionic</p>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
             <div class="pool-info">
-                <h3>🏊 Current Pool</h3>
+                <h3>🏊 Pool Information</h3>
                 <div class="pool-details">
                     <div class="pool-item">
-                        <span>Pool:</span>
+                        <span>Pool URL:</span>
                         <span id="current-pool">Not connected</span>
                     </div>
                     <div class="pool-item">
@@ -93,27 +101,19 @@
                 </div>
             </div>
 
-            <div class="status-container">
-                <h3 id="status-title">Mining Status</h3>
-                <p id="status-text" class="status-idle">✅ Ready to mine Crionic</p>
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill"></div>
-                </div>
-            </div>
-
             <div class="log-container">
                 <h3>📝 Mining Log</h3>
                 <div id="mining-log" class="log-content">
                     <div class="log-entry">✅ Crionic Miner loaded successfully!</div>
-                    <div class="log-entry">⚡ Algorithm: yespowerLTNCG</div>
+                    <div class="log-entry">⚡ Algorithm: yespowerLTNCG (CPU-friendly)</div>
                     <div class="log-entry">🏊 Select pool and click START MINING</div>
                 </div>
             </div>
         </main>
 
         <footer>
-            <p id="footer-text">Crionic Miner - yespowerLTNCG CPU Mining | Open Source</p>
-            <p class="footer-info">Supported pools: coin-miners.info • aikapool.com • zpool.ca • mining4people.com</p>
+            <p id="footer-text">Crionic Miner - yespowerLTNCG CPU Mining | Open Source | No External Scripts</p>
+            <p class="footer-info">✅ 100% functional - No browser blocking</p>
         </footer>
     </div>
 
