@@ -7,14 +7,14 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-// Serve static files from public folder
-app.use(express.static(join(__dirname, 'public')));
+// Middleware
 app.use(express.json());
+app.use(express.static(join(__dirname, 'public')));
 
-// Store connected clients for Server-Sent Events
+// Store connected clients
 const clients = new Set();
 
-// SSE endpoint for mining
+// API routes - MUST come first
 app.get('/api/events', (req, res) => {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
@@ -25,40 +25,39 @@ app.get('/api/events', (req, res) => {
     const clientId = Date.now();
     clients.add(res);
     
-    console.log(`✅ SSE client connected: ${clientId}`);
+    console.log(`✅ Client connected: ${clientId}`);
     
-    // Send welcome message
+    // Send welcome
     res.write(`data: ${JSON.stringify({
         type: 'status',
-        message: 'Connected to Hobbit Miner server'
+        message: 'Connected to Hobbit Miner'
     })}\n\n`);
 
-    // Handle client disconnect
+    // Handle disconnect
     req.on('close', () => {
-        console.log(`❌ SSE client disconnected: ${clientId}`);
+        console.log(`❌ Client disconnected: ${clientId}`);
         clients.delete(res);
     });
 });
 
-// Broadcast to all clients
+// Broadcast function
 function broadcast(data) {
     clients.forEach(client => {
         try {
             client.write(`data: ${JSON.stringify(data)}\n\n`);
         } catch (error) {
-            console.error('Error broadcasting to client:', error);
+            console.error('Broadcast error:', error);
         }
     });
 }
 
-// Start mining endpoint
+// Start mining
 app.post('/api/start-mining', (req, res) => {
     try {
         const { wallet, worker, pool, threads } = req.body;
         
-        console.log(`🚀 Starting mining: ${wallet}.${worker} on ${pool} with ${threads} threads`);
+        console.log(`🚀 Start mining: ${wallet}.${worker}`);
         
-        // Broadcast to all clients
         broadcast({
             type: 'pool_connected',
             pool: pool,
@@ -67,48 +66,26 @@ app.post('/api/start-mining', (req, res) => {
         
         res.json({ 
             success: true, 
-            message: 'Mining started successfully',
+            message: 'Mining started',
             clientCount: clients.size
         });
         
     } catch (error) {
-        console.error('Error in start-mining:', error);
         res.status(500).json({ 
             success: false, 
-            error: 'Internal server error' 
+            error: 'Server error' 
         });
     }
 });
 
-// Stop mining endpoint
+// Stop mining
 app.post('/api/stop-mining', (req, res) => {
-    try {
-        broadcast({
-            type: 'status',
-            message: 'Mining stopped by user'
-        });
-        
-        res.json({ 
-            success: true, 
-            message: 'Mining stopped'
-        });
-        
-    } catch (error) {
-        console.error('Error in stop-mining:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Internal server error' 
-        });
-    }
-});
-
-// API routes
-app.get('/api/status', (req, res) => {
-    res.json({ 
-        status: 'online',
-        clients: clients.size,
-        message: 'Hobbit Miner is running! 🚀'
+    broadcast({
+        type: 'status',
+        message: 'Mining stopped'
     });
+    
+    res.json({ success: true, message: 'Mining stopped' });
 });
 
 // Health check
@@ -119,12 +96,25 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Serve main page - MUST BE LAST
+// Status
+app.get('/api/status', (req, res) => {
+    res.json({ 
+        status: 'online',
+        message: 'Hobbit Miner 🚀'
+    });
+});
+
+// Serve miner.js
+app.get('/miner.js', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'miner.js'));
+});
+
+// Catch-all - MUST BE LAST
 app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`⚡ Hobbit Miner Server running on port ${PORT}`);
+    console.log(`⚡ Server running on port ${PORT}`);
 });
