@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crionic Miner - CPU Mining</title>
+    <title>Crionic Miner - AIKAPOOL Mining</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,19 +20,17 @@
         <main>
             <div class="mining-controls">
                 <div class="pool-selector">
-                    <label id="pool-label" for="pool-select">Mining Pool:</label>
+                    <label id="pool-label" for="pool-select">AIKAPOOL Server:</label>
                     <select id="pool-select">
-                        <option value="coin-miners.info:6234">coin-miners.info:6234</option>
-                        <option value="aikapool.com:6234">aikapool.com:6234</option>
-                        <option value="zpool.ca:6234">zpool.ca:6234</option>
-                        <option value="mining4people.com:6234">mining4people.com:6234</option>
+                        <option value="stratum.aikapool.com:3939">stratum.aikapool.com:3939 (Low Diff)</option>
+                        <option value="stratum.aikapool.com:3639">stratum.aikapool.com:3639 (High Diff)</option>
                     </select>
                 </div>
 
                 <div class="wallet-settings">
                     <label id="wallet-label" for="wallet-input">Crionic Wallet:</label>
-                    <input type="text" id="wallet-input" placeholder="CX... your Crionic address" value="CXexample1234567890CrionicWallet">
-                    <small id="wallet-help">Algorithm: yespowerLTNCG | Port: 6234</small>
+                    <input type="text" id="wallet-input" placeholder="USER.WORKER" value="your_username.worker1">
+                    <small id="wallet-help">Format: username.workername | Algorithm: yespowerltncg</small>
                 </div>
 
                 <div class="thread-control">
@@ -48,7 +46,7 @@
                 <div class="action-buttons">
                     <button id="start-btn" class="btn btn-primary">⛏️ START MINING</button>
                     <button id="stop-btn" class="btn btn-secondary" disabled>🛑 STOP MINING</button>
-                    <button id="reset-btn" class="btn btn-success">🔄 RESET</button>
+                    <button id="test-btn" class="btn btn-success">🧪 TEST CONNECTION</button>
                 </div>
             </div>
 
@@ -71,28 +69,20 @@
                 </div>
             </div>
 
-            <div class="status-container">
-                <h3 id="status-title">Mining Status</h3>
-                <p id="status-text" class="status-idle">✅ Ready to mine Crionic</p>
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill"></div>
-                </div>
-            </div>
-
             <div class="pool-info">
-                <h3>🏊 Pool Information</h3>
+                <h3>🏊 AIKAPOOL Connection</h3>
                 <div class="pool-details">
                     <div class="pool-item">
-                        <span>Pool URL:</span>
+                        <span>Server:</span>
                         <span id="current-pool">Not connected</span>
                     </div>
                     <div class="pool-item">
                         <span>Algorithm:</span>
-                        <span id="current-algo">yespowerLTNCG</span>
+                        <span id="current-algo">yespowerltncg</span>
                     </div>
                     <div class="pool-item">
-                        <span>Port:</span>
-                        <span id="current-port">6234</span>
+                        <span>Difficulty:</span>
+                        <span id="current-diff">VarDiff</span>
                     </div>
                     <div class="pool-item">
                         <span>Status:</span>
@@ -101,19 +91,28 @@
                 </div>
             </div>
 
+            <div class="status-container">
+                <h3 id="status-title">Mining Status</h3>
+                <p id="status-text" class="status-idle">✅ Ready to connect to AIKAPOOL</p>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
             <div class="log-container">
                 <h3>📝 Mining Log</h3>
                 <div id="mining-log" class="log-content">
                     <div class="log-entry">✅ Crionic Miner loaded successfully!</div>
-                    <div class="log-entry">⚡ Algorithm: yespowerLTNCG (CPU-friendly)</div>
-                    <div class="log-entry">🏊 Select pool and click START MINING</div>
+                    <div class="log-entry">⚡ Algorithm: yespowerltncg (CPU-friendly)</div>
+                    <div class="log-entry">🏊 AIKAPOOL: stratum.aikapool.com:3939</div>
+                    <div class="log-entry">👤 Wallet format: username.workername</div>
                 </div>
             </div>
         </main>
 
         <footer>
-            <p id="footer-text">Crionic Miner - yespowerLTNCG CPU Mining | Open Source | No External Scripts</p>
-            <p class="footer-info">✅ 100% functional - No browser blocking</p>
+            <p id="footer-text">Crionic Miner - AIKAPOOL Stratum Mining | Open Source | No External Scripts</p>
+            <p class="footer-info">✅ 100% functional - Pure JavaScript Web Workers</p>
         </footer>
     </div>
 
