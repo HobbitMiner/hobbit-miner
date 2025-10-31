@@ -1,7 +1,6 @@
-\
 // app.js - UI glue
 class RealHobbitMinerApp {
-  constructor(){ this.isMining=false; this.currentLang='en'; }
+  constructor(){ this.isMining=false; }
   init(){
     this.cache();
     this.bind();
@@ -44,9 +43,9 @@ class RealHobbitMinerApp {
     window.realCoinImpMiner.start();
     this.isMining=true;
     this.el.start.disabled=true; this.el.stop.disabled=false;
-    this.el.status.textContent = 'Mining...';
+    this.el.status.textContent = 'Mining...'; this.el.status.className='status-mining';
   }
-  stop(){ window.realCoinImpMiner.stop(); this.isMining=false; this.el.start.disabled=false; this.el.stop.disabled=true; this.el.status.textContent='Stopped'; }
+  stop(){ window.realCoinImpMiner.stop(); this.isMining=false; this.el.start.disabled=false; this.el.stop.disabled=true; this.el.status.textContent='Stopped'; this.el.status.className=''; }
   updateDisplay(s){
     if (!s) return;
     this.el.hashrate.textContent = (s.hashrate||0).toFixed(2) + ' H/s';
