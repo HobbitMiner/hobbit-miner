@@ -1,79 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Hobbit Miner - Real Browser Mining</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crionic Miner - CPU Mining</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1 id="title">Hobbit Miner</h1>
-    </header>
+    <div class="container">
+        <header>
+            <h1 id="title">Crionic Miner</h1>
+            <div class="language-selector">
+                <button id="lang-en" class="lang-btn active">EN</button>
+                <button id="lang-sk" class="lang-btn">SK</button>
+                <button id="lang-ru" class="lang-btn">RU</button>
+            </div>
+        </header>
 
-    <main>
-      <div class="mining-controls">
-        <div class="wallet-settings">
-          <label id="wallet-label" for="wallet-input">Your XMR Wallet Address:</label>
-          <input type="text" id="wallet-input" placeholder="Enter your Monero wallet address">
-          <small id="wallet-help">Enter your XMR address. Required for real payout.</small>
-        </div>
+        <main>
+            <div class="mining-controls">
+                <div class="pool-selector">
+                    <label id="pool-label" for="pool-select">Mining Pool:</label>
+                    <select id="pool-select">
+                        <option value="coin-miners.info">coin-miners.info:6234</option>
+                        <option value="aikapool.com">aikapool.com:6234</option>
+                        <option value="zpool.ca">zpool.ca:6234</option>
+                        <option value="mining4people.com">mining4people.com:6234</option>
+                    </select>
+                </div>
 
-        <div class="thread-control">
-          <label id="thread-label">CPU Threads: <span id="thread-value">4</span></label>
-          <input type="range" id="thread-slider" min="1" max="8" value="4" class="slider">
-        </div>
+                <div class="wallet-settings">
+                    <label id="wallet-label" for="wallet-input">Crionic Wallet:</label>
+                    <input type="text" id="wallet-input" placeholder="CX... your Crionic address">
+                    <small id="wallet-help">Algorithm: yespowerLTNCG | Port: 6234</small>
+                </div>
 
-        <div class="intensity-control">
-          <label id="intensity-label">Mining Intensity: <span id="intensity-value">75</span>%</label>
-          <input type="range" id="intensity-slider" min="10" max="100" value="75" class="slider">
-        </div>
+                <div class="thread-control">
+                    <label id="thread-label">CPU Threads: <span id="thread-value">4</span></label>
+                    <input type="range" id="thread-slider" min="1" max="8" value="4" class="slider">
+                </div>
 
-        <div class="action-buttons">
-          <button id="start-btn" class="btn btn-primary">🚀 Start Real Mining</button>
-          <button id="stop-btn" class="btn btn-secondary" disabled>🛑 Stop Mining</button>
-        </div>
-      </div>
+                <div class="intensity-control">
+                    <label id="intensity-label">Mining Intensity: <span id="intensity-value">75</span>%</label>
+                    <input type="range" id="intensity-slider" min="10" max="100" value="75" class="slider">
+                </div>
 
-      <div class="stats-container">
-        <div class="stat-card">
-          <h3 id="hashrate-title">Hashrate</h3>
-          <p id="hashrate-value">0 H/s</p>
-        </div>
-        <div class="stat-card">
-          <h3 id="threads-title">Active Threads</h3>
-          <p id="threads-value">0</p>
-        </div>
-        <div class="stat-card">
-          <h3 id="mined-title">Total Hashes</h3>
-          <p id="mined-value">0</p>
-        </div>
-        <div class="stat-card">
-          <h3 id="cpu-title">CPU Usage</h3>
-          <p id="cpu-value">0%</p>
-        </div>
-      </div>
+                <div class="action-buttons">
+                    <button id="start-btn" class="btn btn-primary">⛏️ START MINING</button>
+                    <button id="stop-btn" class="btn btn-secondary" disabled>🛑 STOP MINING</button>
+                    <button id="stats-btn" class="btn btn-success">📊 POOL STATS</button>
+                </div>
+            </div>
 
-      <div class="status-container">
-        <h3 id="status-title">Mining Status</h3>
-        <p id="status-text" class="status-idle">✅ Ready</p>
-        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
-      </div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3 id="hashrate-title">Hashrate</h3>
+                    <p id="hashrate-value">0 H/s</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="threads-title">Active Threads</h3>
+                    <p id="threads-value">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="shares-title">Accepted Shares</h3>
+                    <p id="shares-value">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="cpu-title">CPU Usage</h3>
+                    <p id="cpu-value">0%</p>
+                </div>
+            </div>
 
-      <div class="log-container">
-        <h3>📝 Mining Log</h3>
-        <div id="mining-log" class="log-content"></div>
-      </div>
-    </main>
+            <div class="pool-info">
+                <h3>🏊 Current Pool</h3>
+                <div class="pool-details">
+                    <div class="pool-item">
+                        <span>Pool:</span>
+                        <span id="current-pool">Not connected</span>
+                    </div>
+                    <div class="pool-item">
+                        <span>Algorithm:</span>
+                        <span id="current-algo">yespowerLTNCG</span>
+                    </div>
+                    <div class="pool-item">
+                        <span>Port:</span>
+                        <span id="current-port">6234</span>
+                    </div>
+                    <div class="pool-item">
+                        <span>Status:</span>
+                        <span id="pool-status" class="status-disconnected">Disconnected</span>
+                    </div>
+                </div>
+            </div>
 
-    <footer>
-      <p id="footer-text">Hobbit Miner - Real Browser Mining</p>
-    </footer>
-  </div>
+            <div class="status-container">
+                <h3 id="status-title">Mining Status</h3>
+                <p id="status-text" class="status-idle">✅ Ready to mine Crionic</p>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
 
-  <!-- miner.js obsahuje tvoj site key natvrdo, preto iba toto voláme -->
-  <script src="miner.js"></script>
-  <script src="app.js"></script>
+            <div class="log-container">
+                <h3>📝 Mining Log</h3>
+                <div id="mining-log" class="log-content">
+                    <div class="log-entry">✅ Crionic Miner loaded successfully!</div>
+                    <div class="log-entry">⚡ Algorithm: yespowerLTNCG</div>
+                    <div class="log-entry">🏊 Select pool and click START MINING</div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p id="footer-text">Crionic Miner - yespowerLTNCG CPU Mining | Open Source</p>
+            <p class="footer-info">Supported pools: coin-miners.info • aikapool.com • zpool.ca • mining4people.com</p>
+        </footer>
+    </div>
+
+    <script src="miner.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
