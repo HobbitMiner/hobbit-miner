@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚒️ Hobbit Miner - Real CRNC Mining</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-        }
-        
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -38,7 +30,7 @@
         }
         
         header { 
-            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%); 
+            background: #2c3e50; 
             color: white; 
             padding: 30px; 
             text-align: center; 
@@ -73,17 +65,16 @@
             font-size: 16px; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: all 0.3s; 
             margin: 5px;
         }
         
         .btn-success { 
-            background: var(--success); 
+            background: #27ae60; 
             color: white; 
         }
         
         .btn-danger { 
-            background: var(--danger); 
+            background: #e74c3c; 
             color: white; 
         }
         
@@ -104,7 +95,6 @@
             padding: 20px; 
             border-radius: 8px; 
             text-align: center; 
-            border-left: 4px solid var(--secondary);
         }
         
         .cpu-warning { 
@@ -113,12 +103,7 @@
             padding: 15px; 
             border-radius: 8px; 
             margin: 20px 0; 
-            border-left: 4px solid var(--danger);
         }
-        
-        .status-connected { color: green; font-weight: bold; }
-        .status-disconnected { color: red; font-weight: bold; }
-        .status-mining { color: orange; font-weight: bold; }
         
         .log-container {
             background: #1e1e1e;
@@ -166,11 +151,10 @@
             <div class="actions">
                 <button id="startBtn" class="btn btn-success">⛏️ Start Real Mining</button>
                 <button id="stopBtn" class="btn btn-danger" disabled>🛑 Stop Mining</button>
-                <button id="testBtn" class="btn">🔧 Test Connection</button>
             </div>
             
             <div class="cpu-warning">
-                <strong>⚠️ WARNING:</strong> This is REAL CPU mining. It will use 100% of your CPU and may slow down your device.
+                <strong>⚠️ WARNING:</strong> This is REAL CPU mining. It will use 100% of your CPU!
             </div>
             
             <div class="stats-grid">
@@ -190,12 +174,6 @@
                     <div>✅ Accepted Shares</div>
                     <div id="acceptedShares">0</div>
                 </div>
-            </div>
-            
-            <div class="pool-status">
-                <h3>🌐 Connection Status</h3>
-                <div id="connectionStatus" class="status-disconnected">Disconnected</div>
-                <div id="workerStats"></div>
             </div>
             
             <div class="log-container" id="log">
