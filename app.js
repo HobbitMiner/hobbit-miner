@@ -7,7 +7,9 @@ class RealHobbitMinerApp {
             threads: 4,
             totalHashes: 0,
             acceptedHashes: 0,
-            cpuUsage: 75
+            cpuUsage: 75,
+            miningTime: '00:00:00',
+            efficiency: 0
         };
         
         this.translations = {
@@ -19,7 +21,7 @@ class RealHobbitMinerApp {
                 walletLabel: "Your XMR Wallet Address:",
                 startBtn: "Start Real Mining",
                 stopBtn: "Stop Mining",
-                statsBtn: "View Stats",
+                resetBtn: "Reset Stats",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Active Threads",
                 minedTitle: "Total Hashes",
@@ -30,8 +32,8 @@ class RealHobbitMinerApp {
                 statusError: "Mining error occurred",
                 footerText: "Hobbit Miner - Real Browser Mining | Open Source | No Data Collection",
                 walletWarning: "Please enter your Monero wallet address",
-                walletHelp: "Example wallet address - replace with your own!",
-                earningsTitle: "Estimated Earnings"
+                walletHelp: "We'll use a demo wallet for testing",
+                performanceTitle: "Performance Metrics"
             },
             sk: {
                 title: "Hobbit Miner",
@@ -41,7 +43,7 @@ class RealHobbitMinerApp {
                 walletLabel: "Vaša XMR adresa peňaženky:",
                 startBtn: "Spustiť reálnu ťažbu",
                 stopBtn: "Zastaviť ťažbu",
-                statsBtn: "Zobraziť štatistiky",
+                resetBtn: "Resetovať štatistiky",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Aktívne vlákna",
                 minedTitle: "Celkový počet hashov",
@@ -52,8 +54,8 @@ class RealHobbitMinerApp {
                 statusError: "Nastala chyba pri ťažbe",
                 footerText: "Hobbit Miner - Reálna webová ťažba | Open Source | Žiadne zbieranie údajov",
                 walletWarning: "Zadajte adresu svojej Monero peňaženky",
-                walletHelp: "Príklad adresy - nahraďte svojou vlastnou!",
-                earningsTitle: "Odhadovaný zárobok"
+                walletHelp: "Použijeme demo peňaženku na testovanie",
+                performanceTitle: "Metriky výkonu"
             },
             ru: {
                 title: "Hobbit Miner",
@@ -63,7 +65,7 @@ class RealHobbitMinerApp {
                 walletLabel: "Адрес вашего XMR кошелька:",
                 startBtn: "Начать реальный майнинг",
                 stopBtn: "Остановить майнинг",
-                statsBtn: "Посмотреть статистику",
+                resetBtn: "Сбросить статистику",
                 hashrateTitle: "Хешрейт",
                 threadsTitle: "Активные потоки",
                 minedTitle: "Всего хешей",
@@ -74,8 +76,8 @@ class RealHobbitMinerApp {
                 statusError: "Произошла ошибка майнинга",
                 footerText: "Hobbit Miner - Реальный браузерный майнинг | Открытый исходный код | Сбор данных отсутствует",
                 walletWarning: "Введите адрес вашего Monero кошелька",
-                walletHelp: "Пример адреса - замените на свой собственный!",
-                earningsTitle: "Расчетный заработок"
+                walletHelp: "Мы используем демо-кошелек для тестирования",
+                performanceTitle: "Метрики производительности"
             }
         };
     }
@@ -100,7 +102,7 @@ class RealHobbitMinerApp {
             walletLabel: document.getElementById('wallet-label'),
             startBtn: document.getElementById('start-btn'),
             stopBtn: document.getElementById('stop-btn'),
-            statsBtn: document.getElementById('stats-btn'),
+            resetBtn: document.getElementById('reset-btn'),
             hashrateTitle: document.getElementById('hashrate-title'),
             threadsTitle: document.getElementById('threads-title'),
             minedTitle: document.getElementById('mined-title'),
@@ -121,10 +123,10 @@ class RealHobbitMinerApp {
             cryptoSelect: document.getElementById('crypto-select'),
             progressFill: document.getElementById('progress-fill'),
             miningLog: document.getElementById('mining-log'),
-            hourlyEarnings: document.getElementById('hourly-earnings'),
-            dailyEarnings: document.getElementById('daily-earnings'),
-            weeklyEarnings: document.getElementById('weekly-earnings'),
-            monthlyEarnings: document.getElementById('monthly-earnings')
+            hpsValue: document.getElementById('hps-value'),
+            sharesValue: document.getElementById('shares-value'),
+            timeValue: document.getElementById('time-value'),
+            efficiencyValue: document.getElementById('efficiency-value')
         };
 
         this.langButtons = {
@@ -169,7 +171,7 @@ class RealHobbitMinerApp {
         this.elements.walletLabel.textContent = t.walletLabel;
         this.elements.startBtn.textContent = t.startBtn;
         this.elements.stopBtn.textContent = t.stopBtn;
-        this.elements.statsBtn.textContent = t.statsBtn;
+        this.elements.resetBtn.textContent = t.resetBtn;
         this.elements.hashrateTitle.textContent = t.hashrateTitle;
         this.elements.threadsTitle.textContent = t.threadsTitle;
         this.elements.minedTitle.textContent = t.minedTitle;
@@ -178,7 +180,7 @@ class RealHobbitMinerApp {
         this.elements.footerText.textContent = t.footerText;
         this.elements.walletHelp.textContent = t.walletHelp;
         
-        document.querySelector('.earnings-container h3').textContent = t.earningsTitle;
+        document.querySelector('.performance-container h3').textContent = t.performanceTitle;
         
         if (!this.isMining) {
             this.elements.statusText.textContent = t.statusIdle;
@@ -215,14 +217,8 @@ class RealHobbitMinerApp {
             this.stopRealMining();
         });
         
-        this.elements.statsBtn.addEventListener('click', () => {
-            this.showStats();
-        });
-
-        this.elements.walletInput.addEventListener('input', (e) => {
-            if (e.target.value.length > 10) {
-                this.addLog("Wallet address updated");
-            }
+        this.elements.resetBtn.addEventListener('click', () => {
+            this.resetStats();
         });
     }
 
@@ -236,39 +232,25 @@ class RealHobbitMinerApp {
     startRealMining() {
         console.log("Starting REAL mining process...");
         
-        const wallet = this.elements.walletInput.value.trim();
         const threads = parseInt(this.elements.threadSlider.value);
         const intensity = parseInt(this.elements.intensitySlider.value);
 
-        if (!wallet) {
-            alert(this.translations[this.currentLanguage].walletWarning);
-            this.addLog("Please enter wallet address!");
-            return;
-        }
-
-        if (wallet.length < 95) {
-            this.addLog("Wallet address seems too short. Please check!");
-            return;
-        }
-
-        this.addLog("Initializing miner with your settings...");
+        this.addLog("Initializing miner with " + threads + " threads at " + intensity + "% intensity...");
 
         try {
-            const success = window.realHobbitMiner.initialize(wallet, threads, intensity);
+            const success = window.realHobbitMiner.initialize(threads, intensity);
             
             if (success) {
-                setTimeout(() => {
-                    window.realHobbitMiner.start();
-                    this.isMining = true;
-                    
-                    this.elements.startBtn.disabled = true;
-                    this.elements.stopBtn.disabled = false;
-                    this.elements.statusText.textContent = this.translations[this.currentLanguage].statusMining;
-                    this.elements.statusText.className = 'status-text status-mining';
-                    
-                    this.addLog("Mining started successfully!");
-                    
-                }, 1000);
+                window.realHobbitMiner.start();
+                this.isMining = true;
+                
+                this.elements.startBtn.disabled = true;
+                this.elements.stopBtn.disabled = false;
+                this.elements.statusText.textContent = this.translations[this.currentLanguage].statusMining;
+                this.elements.statusText.className = 'status-text status-mining';
+                
+                this.addLog("Mining started successfully!");
+                
             } else {
                 this.addLog("Failed to initialize miner!");
             }
@@ -295,57 +277,59 @@ class RealHobbitMinerApp {
         this.addLog("Mining stopped");
     }
 
-    showStats() {
-        if (window.realHobbitMiner) {
-            const stats = window.realHobbitMiner.getStats();
-            this.addLog("Current Stats - Hashrate: " + stats.hashrate.toFixed(2) + " H/s, Hashes: " + stats.totalHashes + ", Accepted: " + stats.acceptedHashes);
-        } else {
-            this.addLog("No active mining session");
-        }
+    resetStats() {
+        this.miningStats = {
+            hashrate: 0,
+            threads: 4,
+            totalHashes: 0,
+            acceptedHashes: 0,
+            cpuUsage: 75,
+            miningTime: '00:00:00',
+            efficiency: 0
+        };
+        this.updateDisplay();
+        this.addLog("Statistics reset");
     }
 
     updateRealMinerStats(stats) {
         this.miningStats = { ...this.miningStats, ...stats };
+        
+        // Get additional stats from miner
+        if (window.realHobbitMiner) {
+            const minerStats = window.realHobbitMiner.getStats();
+            this.miningStats.miningTime = minerStats.miningTime;
+            this.miningStats.efficiency = minerStats.efficiency;
+        }
+        
         this.updateDisplay();
     }
 
     updateDisplay() {
-        this.elements.hashrateValue.textContent = this.miningStats.hashrate.toFixed(2) + " H/s";
+        // Update main statistics
+        this.elements.hashrateValue.textContent = this.miningStats.hashrate.toLocaleString() + " H/s";
         this.elements.threadsValue.textContent = this.miningStats.threads;
         this.elements.minedValue.textContent = this.miningStats.totalHashes.toLocaleString();
         this.elements.cpuValue.textContent = this.miningStats.cpuUsage + "%";
         
+        // Update progress bar
         this.elements.progressFill.style.width = this.miningStats.cpuUsage + "%";
         
-        this.updateEarningsDisplay();
-    }
-
-    updateEarningsDisplay() {
-        const xmrPerDay = (this.miningStats.hashrate * 86400) / 1000000000;
-        const hourly = xmrPerDay / 24;
-        const daily = xmrPerDay;
-        const weekly = xmrPerDay * 7;
-        const monthly = xmrPerDay * 30;
-
-        this.elements.hourlyEarnings.textContent = hourly.toFixed(8) + " XMR";
-        this.elements.dailyEarnings.textContent = daily.toFixed(8) + " XMR";
-        this.elements.weeklyEarnings.textContent = weekly.toFixed(8) + " XMR";
-        this.elements.monthlyEarnings.textContent = monthly.toFixed(8) + " XMR";
+        // Update performance metrics
+        this.elements.hpsValue.textContent = this.miningStats.hashrate.toLocaleString();
+        this.elements.sharesValue.textContent = this.miningStats.acceptedHashes;
+        this.elements.timeValue.textContent = this.miningStats.miningTime;
+        this.elements.efficiencyValue.textContent = this.miningStats.efficiency + "%";
     }
 
     addLog(message) {
         const logEntry = document.createElement('div');
         logEntry.className = 'log-entry';
-        logEntry.innerHTML = message;
+        logEntry.textContent = message;
         
         this.elements.miningLog.appendChild(logEntry);
         this.elements.miningLog.scrollTop = this.elements.miningLog.scrollHeight;
         
         console.log("HobbitMiner UI: " + message);
-    }
-
-    getTranslation(key) {
-        return this.translations[this.currentLanguage][key] || key;
     }
 }
 
@@ -354,11 +338,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.realHobbitMinerApp = new RealHobbitMinerApp();
     window.realHobbitMinerApp.init();
 });
-
-setTimeout(() => {
-    if (!window.realHobbitMinerApp) {
-        console.log("Fallback initialization...");
-        window.realHobbitMinerApp = new RealHobbitMinerApp();
-        window.realHobbitMinerApp.init();
-    }
-}, 1000);
