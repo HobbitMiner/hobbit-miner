@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crionic WebMiner - Real CPU Mining</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 Crionic WebMiner</h1>
+            <p>Real CPU Mining for CRNC (yespowerltncg)</p>
+        </header>
+        
+        <div class="miner-form">
+            <div class="form-group">
+                <label for="wallet">CRNC Wallet Address:</label>
+                <input type="text" id="wallet" placeholder="CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB" value="">
+                <small>Example: CRNCwxKVeGKfF8yhkFYYwWtM7SqD3gvFxB</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="worker">Worker Name:</label>
+                <input type="text" id="worker" placeholder="web1" value="web1">
+            </div>
+            
+            <div class="form-group">
+                <label for="pool">Mining Pool:</label>
+                <select id="pool">
+                    <option value="stratum.aikapool.com:3939">Aikapool - stratum.aikapool.com:3939</option>
+                    <option value="eu.crionic.xyz:5555">Coin-Miners EU - eu.crionic.xyz:5555</option>
+                    <option value="crn.cryptoverse.mining:5555">Cryptoverse - crn.cryptoverse.mining:5555</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="threads">CPU Threads: <span id="threadCount">2</span></label>
+                <input type="range" id="threads" min="1" max="8" value="2">
+                <small>Recommended: 2 threads for optimal performance</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="intensity">Mining Intensity: <span id="intensityValue">85%</span></label>
+                <input type="range" id="intensity" min="10" max="100" value="85">
+                <small>Lower intensity = less CPU usage</small>
+            </div>
+            
+            <div class="actions">
+                <button id="startBtn" class="btn btn-success">🚀 Start Real Mining</button>
+                <button id="stopBtn" class="btn btn-danger" disabled>⏹️ Stop Mining</button>
+                <button id="qrBtn" class="btn btn-secondary">📱 Show QR Code</button>
+                <button id="configBtn" class="btn btn-info">⚙️ Advanced Settings</button>
+            </div>
+            
+            <div class="cpu-warning">
+                <h3>⚠️ WARNING: REAL CPU MINING</h3>
+                <p>This miner uses 100% of your CPU cores and will:</p>
+                <ul>
+                    <li>Significantly increase power consumption</li>
+                    <li>Generate heat and may slow down your device</li>
+                    <li>Reduce battery life on mobile devices</li>
+                </ul>
+                <p>Use responsibly and monitor device temperature!</p>
+            </div>
+            
+            <div class="mining-stats">
+                <h3>📊 Mining Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Mining Time</div>
+                        <div class="stat-value" id="time">00:00:00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Hashrate</div>
+                        <div class="stat-value" id="hashrate">0 H/s</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Hashes</div>
+                        <div class="stat-value" id="totalHashes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accepted Shares</div>
+                        <div class="stat-value" id="acceptedShares">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Rejected Shares</div>
+                        <div class="stat-value" id="rejectedShares">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pool Difficulty</div>
+                        <div class="stat-value" id="difficulty">N/A</div>
+                    </div>
+                </div>
+                
+                <div class="pool-info">
+                    <h4>🌐 Pool Connection</h4>
+                    <div class="pool-status">
+                        <span class="status-indicator" id="poolStatusIndicator"></span>
+                        <span id="poolStatusText">Disconnected</span>
+                        <span id="poolLatency" class="latency">Latency: N/A</span>
+                    </div>
+                    <div class="worker-stats" id="workerStats">
+                        <!-- Worker threads will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="donation-notice">
+                <p>💝 This miner includes a 1% developer donation to support maintenance and improvements. Thank you for your support!</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Crionic WebMiner v1.0 &copy; 2024 | Algorithm: yespowerltncg | Powered by WebAssembly</p>
+        </footer>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>📱 Your CRNC Wallet QR Code</h3>
+            <div id="qrCode"></div>
+            <p id="walletAddress"></p>
+        </div>
+    </div>
+
+    <!-- Advanced Settings Modal -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>⚙️ Advanced Mining Settings</h3>
+            <div class="form-group">
+                <label for="customPool">Custom Pool URL:</label>
+                <input type="text" id="customPool" placeholder="stratum+tcp://pool:port">
+            </div>
+            <div class="form-group">
+                <label for="donationPercent">Developer Donation: <span id="donationValue">1%</span></label>
+                <input type="range" id="donationPercent" min="0" max="5" value="1" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="autoStart"> Auto-start mining when page loads
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="enableLogging" checked> Enable detailed logging
+                </label>
+            </div>
+            <button id="saveConfig" class="btn btn-success">💾 Save Settings</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="stratum-client.js"></script>
+    <script src="yespower-miner.js"></script>
+    <script src="qr-generator.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
