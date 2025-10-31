@@ -239,25 +239,25 @@ select, input[type="text"] {
     transition: width 0.3s ease;
 }
 
-.earnings-container {
+.performance-container {
     background: rgba(45, 74, 92, 0.6);
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 25px;
 }
 
-.earnings-container h3 {
+.performance-container h3 {
     color: #4CAF50;
     margin-bottom: 15px;
 }
 
-.earnings-grid {
+.performance-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
 }
 
-.earning-item {
+.metric {
     display: flex;
     justify-content: space-between;
     padding: 10px;
@@ -330,7 +330,7 @@ footer {
         grid-template-columns: 1fr;
     }
     
-    .earnings-grid {
+    .performance-grid {
         grid-template-columns: 1fr;
     }
 }
