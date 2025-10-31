@@ -1,6 +1,4 @@
 import express from 'express';
-import { WebSocketServer } from 'ws';
-import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -8,91 +6,111 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const server = createServer(app);
 
 // Serve static files from public folder
 app.use(express.static(join(__dirname, 'public')));
 app.use(express.json());
 
-// WebSocket for real mining
-const wss = new WebSocketServer({ server });
+// Store connected clients for Server-Sent Events
+const clients = new Set();
 
-wss.on('connection', (ws) => {
-    console.log('🔌 Miner connected via WebSocket');
-    
-    ws.send(JSON.stringify({
-        type: 'status',
-        message: 'Connected to Hobbit Miner server'
-    }));
-
-    ws.on('message', (message) => {
-        try {
-            const data = JSON.parse(message);
-            console.log('Received:', data);
-            
-            if (data.action === 'start_mining') {
-                // Handle mining start
-                handleStartMining(ws, data);
-            } else if (data.action === 'stop_mining') {
-                // Handle mining stop
-                ws.send(JSON.stringify({
-                    type: 'status', 
-                    message: 'Mining stopped'
-                }));
-            }
-        } catch (error) {
-            console.error('Error parsing message:', error);
-        }
+// SSE endpoint for mining
+app.get('/api/events', (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*'
     });
 
-    ws.on('close', () => {
-        console.log('❌ Miner disconnected');
+    const clientId = Date.now();
+    clients.add(res);
+    
+    console.log(`🔌 New SSE client connected: ${clientId}`);
+    
+    // Send welcome message
+    res.write(`data: ${JSON.stringify({
+        type: 'status',
+        message: 'Connected to Hobbit Miner server'
+    })}\n\n`);
+
+    // Handle client disconnect
+    req.on('close', () => {
+        console.log(`❌ SSE client disconnected: ${clientId}`);
+        clients.delete(res);
     });
 });
 
-function handleStartMining(ws, data) {
-    const { wallet, worker, pool, threads } = data;
+// Broadcast to all clients
+function broadcast(data) {
+    clients.forEach(client => {
+        client.write(`data: ${JSON.stringify(data)}\n\n`);
+    });
+}
+
+// Start mining endpoint
+app.post('/api/start-mining', (req, res) => {
+    const { wallet, worker, pool, threads } = req.body;
     
     console.log(`🚀 Starting mining: ${wallet}.${worker} on ${pool} with ${threads} threads`);
     
-    // Send connection confirmation
-    ws.send(JSON.stringify({
+    // Broadcast to all clients
+    broadcast({
         type: 'pool_connected',
         pool: pool,
         message: `Connected to ${pool}`
-    }));
+    });
     
     // Simulate mining jobs
-    let jobInterval = setInterval(() => {
+    const jobInterval = setInterval(() => {
         const jobId = 'job_' + Date.now();
-        ws.send(JSON.stringify({
+        broadcast({
             type: 'mining_job',
             jobId: jobId,
             target: '0000ffff00000000000000000000000000000000000000000000000000000000',
             timestamp: Date.now()
-        }));
+        });
     }, 10000);
     
     // Simulate found shares
-    let shareInterval = setInterval(() => {
+    const shareInterval = setInterval(() => {
         if (Math.random() > 0.7) { // 30% chance to find share
-            ws.send(JSON.stringify({
+            broadcast({
                 type: 'share_accepted',
                 shareId: 'share_' + Date.now(),
                 message: 'Share accepted by pool'
-            }));
+            });
         }
     }, 15000);
     
-    // Cleanup on stop or disconnect
-    ws._miningIntervals = [jobInterval, shareInterval];
-}
+    // Store intervals for cleanup (in real app, you'd manage this properly)
+    setTimeout(() => {
+        clearInterval(jobInterval);
+        clearInterval(shareInterval);
+    }, 3600000); // Cleanup after 1 hour
+    
+    res.json({ 
+        success: true, 
+        message: 'Mining started successfully',
+        clientCount: clients.size
+    });
+});
+
+// Stop mining endpoint
+app.post('/api/stop-mining', (req, res) => {
+    broadcast({
+        type: 'status',
+        message: 'Mining stopped by user'
+    });
+    
+    res.json({ success: true, message: 'Mining stopped' });
+});
 
 // API routes
 app.get('/api/status', (req, res) => {
     res.json({ 
         status: 'online',
-        miners: wss.clients.size,
+        clients: clients.size,
         message: 'Hobbit Miner is running! 🚀'
     });
 });
@@ -124,7 +142,7 @@ app.get('/miner.js', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`⚡ Hobbit Miner Server running on port ${PORT}`);
     console.log(`🌐 Open http://localhost:${PORT} to start mining!`);
 });
