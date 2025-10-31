@@ -4,7 +4,7 @@ body { font-family: Arial, sans-serif; background:#0d1b2a; color:#e0e0e0; paddin
 .mining-controls{ background:rgba(45,74,92,0.6); padding:15px; border-radius:6px; margin-bottom:15px;}
 label{ color:#4CAF50; display:block; margin-bottom:6px; }
 input[type=text], select{ width:100%; padding:8px; border-radius:4px; border:1px solid #333; background:#08121a; color:#e0e0e0;}
-.slider{ width:100%; }
+.slider{ width:100%; margin-top:6px; }
 .action-buttons{ display:flex; gap:10px; margin-top:10px;}
 .btn{ padding:10px 14px; border:none; border-radius:6px; cursor:pointer; }
 .btn-primary{ background:#4CAF50; color:#fff;}
@@ -15,3 +15,5 @@ input[type=text], select{ width:100%; padding:8px; border-radius:4px; border:1px
 .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,#4CAF50,#45a049); transition:width .3s;}
 .log-content{ background:#08121a; padding:10px; border-radius:6px; height:160px; overflow:auto; font-family:monospace; font-size:0.9rem;}
 .log-entry{ padding:6px 8px; border-left:3px solid #4CAF50; margin-bottom:6px; background:rgba(76,175,80,0.05);}
+.status-idle{ padding:8px; border-radius:6px; background:rgba(76,175,80,0.06); color:#4CAF50; display:inline-block; }
+.status-mining{ padding:8px; border-radius:6px; background:rgba(33,150,243,0.06); color:#2196F3; display:inline-block; }
