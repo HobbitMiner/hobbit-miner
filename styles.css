@@ -65,7 +65,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-.crypto-selector, .thread-control, .intensity-control, .pool-settings, .wallet-settings {
+.crypto-selector, .thread-control, .intensity-control, .wallet-settings {
     margin-bottom: 20px;
 }
 
@@ -84,6 +84,13 @@ select, input[type="text"] {
     border-radius: 5px;
     color: #e0e0e0;
     font-size: 1rem;
+}
+
+#wallet-help {
+    color: #8fa3b0;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
 }
 
 .slider {
@@ -138,6 +145,16 @@ select, input[type="text"] {
 
 .btn-secondary:hover:not(:disabled) {
     background: #da190b;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #2196F3;
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #1976D2;
     transform: translateY(-2px);
 }
 
@@ -222,6 +239,32 @@ select, input[type="text"] {
     transition: width 0.3s ease;
 }
 
+.earnings-container {
+    background: rgba(45, 74, 92, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.earnings-container h3 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.earnings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.earning-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(26, 42, 58, 0.8);
+    border-radius: 5px;
+}
+
 .log-container {
     background: rgba(45, 74, 92, 0.6);
     padding: 20px;
@@ -235,7 +278,7 @@ select, input[type="text"] {
 }
 
 .log-content {
-    height: 150px;
+    height: 200px;
     overflow-y: auto;
     background: #1a2a3a;
     padding: 15px;
@@ -245,10 +288,11 @@ select, input[type="text"] {
 }
 
 .log-entry {
-    margin-bottom: 5px;
-    padding: 5px;
+    margin-bottom: 8px;
+    padding: 8px;
     border-left: 3px solid #4CAF50;
     background: rgba(76, 175, 80, 0.1);
+    border-radius: 3px;
 }
 
 footer {
@@ -256,6 +300,12 @@ footer {
     padding-top: 20px;
     border-top: 1px solid #2d4a5c;
     color: #8fa3b0;
+}
+
+.footer-info {
+    font-size: 0.9rem;
+    margin-top: 5px;
+    color: #4CAF50;
 }
 
 /* Responsive Design */
@@ -278,6 +328,10 @@ footer {
     }
     
     .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .earnings-grid {
         grid-template-columns: 1fr;
     }
 }
