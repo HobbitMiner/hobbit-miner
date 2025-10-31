@@ -9,66 +9,67 @@ class CrionicMinerApp {
             acceptedHashes: 0,
             cpuUsage: 75,
             poolStatus: 'disconnected',
-            currentPool: 'Not connected'
+            currentPool: 'Not connected',
+            difficulty: 'VarDiff'
         };
         
         this.translations = {
             en: {
                 title: "Crionic Miner",
-                poolLabel: "Mining Pool:",
+                poolLabel: "AIKAPOOL Server:",
                 walletLabel: "Crionic Wallet:",
                 threadLabel: "CPU Threads:",
                 intensityLabel: "Mining Intensity:",
                 startBtn: "START MINING",
                 stopBtn: "STOP MINING",
-                resetBtn: "RESET",
+                testBtn: "TEST CONNECTION",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Active Threads",
                 sharesTitle: "Accepted Shares",
                 cpuTitle: "CPU Usage",
                 statusTitle: "Mining Status",
-                statusIdle: "Ready to mine Crionic",
-                statusMining: "Mining Crionic...",
-                poolTitle: "Pool Information",
-                footerText: "Crionic Miner - yespowerLTNCG CPU Mining | Open Source"
+                statusIdle: "Ready to connect to AIKAPOOL",
+                statusMining: "Mining on AIKAPOOL...",
+                poolTitle: "AIKAPOOL Connection",
+                footerText: "Crionic Miner - AIKAPOOL Stratum Mining | Open Source"
             },
             sk: {
                 title: "Crionic Miner",
-                poolLabel: "Mining Pool:",
+                poolLabel: "AIKAPOOL Server:",
                 walletLabel: "Crionic Peňaženka:",
                 threadLabel: "CPU Vlákna:",
                 intensityLabel: "Intenzita ťažby:",
                 startBtn: "SPUSTIŤ ŤAŽBU",
                 stopBtn: "ZASTAVIŤ ŤAŽBU",
-                resetBtn: "RESET",
+                testBtn: "TESTOVAT PRIPOJENIE",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Aktívne vlákna",
                 sharesTitle: "Akceptované share",
                 cpuTitle: "Využitie CPU",
                 statusTitle: "Stav ťažby",
-                statusIdle: "Pripravené na ťažbu Crionic",
-                statusMining: "Ťažba Crionic...",
-                poolTitle: "Informácie o poole",
-                footerText: "Crionic Miner - yespowerLTNCG CPU Ťažba | Open Source"
+                statusIdle: "Pripravené na pripojenie k AIKAPOOL",
+                statusMining: "Ťažba na AIKAPOOL...",
+                poolTitle: "AIKAPOOL Pripojenie",
+                footerText: "Crionic Miner - AIKAPOOL Stratum Ťažba | Open Source"
             },
             ru: {
                 title: "Crionic Miner",
-                poolLabel: "Майнинг пул:",
+                poolLabel: "AIKAPOOL Сервер:",
                 walletLabel: "Crionic Кошелёк:",
                 threadLabel: "Потоки CPU:",
                 intensityLabel: "Интенсивность майнинга:",
                 startBtn: "НАЧАТЬ МАЙНИНГ",
                 stopBtn: "ОСТАНОВИТЬ МАЙНИНГ",
-                resetBtn: "СБРОС",
+                testBtn: "ТЕСТ ПОДКЛЮЧЕНИЯ",
                 hashrateTitle: "Хешрейт",
                 threadsTitle: "Активные потоки",
                 sharesTitle: "Принятые шары",
                 cpuTitle: "Использование CPU",
                 statusTitle: "Статус майнинга",
-                statusIdle: "Готов к майнингу Crionic",
-                statusMining: "Майнинг Crionic...",
-                poolTitle: "Информация о пуле",
-                footerText: "Crionic Miner - yespowerLTNCG CPU Майнинг | Открытый код"
+                statusIdle: "Готов к подключению к AIKAPOOL",
+                statusMining: "Майнинг на AIKAPOOL...",
+                poolTitle: "AIKAPOOL Подключение",
+                footerText: "Crionic Miner - AIKAPOOL Stratum Майнинг | Открытый код"
             }
         };
     }
@@ -82,7 +83,7 @@ class CrionicMinerApp {
         this.updateDisplay();
         
         this.addLog("✅ Crionic Miner App initialized successfully!");
-        this.addLog("⚡ Algorithm: yespowerLTNCG - Ready for CPU mining");
+        this.addLog("⚡ Algorithm: yespowerltncg - AIKAPOOL ready");
     }
 
     cacheDomElements() {
@@ -95,7 +96,7 @@ class CrionicMinerApp {
             intensityLabel: document.getElementById('intensity-label'),
             startBtn: document.getElementById('start-btn'),
             stopBtn: document.getElementById('stop-btn'),
-            resetBtn: document.getElementById('reset-btn'),
+            testBtn: document.getElementById('test-btn'),
             hashrateTitle: document.getElementById('hashrate-title'),
             threadsTitle: document.getElementById('threads-title'),
             sharesTitle: document.getElementById('shares-title'),
@@ -122,7 +123,8 @@ class CrionicMinerApp {
             progressFill: document.getElementById('progress-fill'),
             miningLog: document.getElementById('mining-log'),
             currentPool: document.getElementById('current-pool'),
-            poolStatus: document.getElementById('pool-status')
+            poolStatus: document.getElementById('pool-status'),
+            currentDiff: document.getElementById('current-diff')
         };
 
         this.langButtons = {
@@ -167,7 +169,7 @@ class CrionicMinerApp {
         this.elements.intensityLabel.textContent = t.intensityLabel;
         this.elements.startBtn.textContent = t.startBtn;
         this.elements.stopBtn.textContent = t.stopBtn;
-        this.elements.resetBtn.textContent = t.resetBtn;
+        this.elements.testBtn.textContent = t.testBtn;
         this.elements.hashrateTitle.textContent = t.hashrateTitle;
         this.elements.threadsTitle.textContent = t.threadsTitle;
         this.elements.sharesTitle.textContent = t.sharesTitle;
@@ -204,21 +206,19 @@ class CrionicMinerApp {
             }
         });
         
-        // START MINING button - FIXED!
+        // START MINING button
         this.elements.startBtn.addEventListener('click', () => {
-            console.log("🎯 START MINING button clicked!");
             this.startMining();
         });
         
         // STOP MINING button
         this.elements.stopBtn.addEventListener('click', () => {
-            console.log("🛑 STOP MINING button clicked!");
             this.stopMining();
         });
         
-        // RESET button
-        this.elements.resetBtn.addEventListener('click', () => {
-            this.resetStats();
+        // TEST CONNECTION button
+        this.elements.testBtn.addEventListener('click', () => {
+            this.testConnection();
         });
 
         // Pool selection
@@ -232,19 +232,23 @@ class CrionicMinerApp {
     initMinerConnection() {
         window.updateMinerStats = (stats) => this.updateMinerStats(stats);
         window.addMiningLog = (message) => this.addMiningLog(message);
-        
-        console.log("✅ Miner connection initialized");
     }
 
     startMining() {
-        console.log("🚀 Starting Crionic mining process...");
-        
         const threads = parseInt(this.elements.threadSlider.value);
         const intensity = parseInt(this.elements.intensitySlider.value);
         const pool = this.elements.poolSelect.value;
+        const wallet = this.elements.walletInput.value.trim();
 
-        this.addLog("🔧 Starting with " + threads + " threads at " + intensity + "% intensity");
+        if (!wallet || wallet === 'your_username.worker1') {
+            this.addLog("❌ Please enter your AIKAPOOL username.worker format!");
+            return;
+        }
+
+        this.addLog("🚀 Starting Crionic mining on AIKAPOOL...");
+        this.addLog("🔧 Threads: " + threads + " | Intensity: " + intensity + "%");
         this.addLog("🏊 Pool: " + pool);
+        this.addLog("👤 Wallet: " + wallet);
 
         try {
             const success = window.crionicMiner.start(threads, intensity);
@@ -258,21 +262,14 @@ class CrionicMinerApp {
                 
                 this.miningStats.currentPool = pool;
                 this.updateDisplay();
-                
-                this.addLog("✅ Mining started successfully!");
-            } else {
-                this.addLog("❌ Failed to start mining!");
             }
             
         } catch (error) {
-            this.addLog("💥 Error starting miner: " + error.message);
-            console.error("Start Mining Error:", error);
+            this.addLog("💥 Error: " + error.message);
         }
     }
 
     stopMining() {
-        console.log("🛑 Stopping mining...");
-        
         if (window.crionicMiner) {
             window.crionicMiner.stop();
         }
@@ -286,18 +283,15 @@ class CrionicMinerApp {
         this.addLog("🛑 Mining stopped");
     }
 
-    resetStats() {
-        this.miningStats = {
-            hashrate: 0,
-            threads: 4,
-            totalHashes: 0,
-            acceptedHashes: 0,
-            cpuUsage: 75,
-            poolStatus: 'disconnected',
-            currentPool: this.elements.poolSelect.value
-        };
-        this.updateDisplay();
-        this.addLog("🔄 Statistics reset");
+    testConnection() {
+        if (window.crionicMiner) {
+            const result = window.crionicMiner.testConnection();
+            this.addLog("🧪 Connection test result:");
+            this.addLog("   Server: " + result.server);
+            this.addLog("   Algorithm: " + result.algorithm);
+            this.addLog("   Status: " + result.status);
+            this.addLog("   Ping: " + result.ping + "ms");
+        }
     }
 
     updateMinerStats(stats) {
@@ -319,6 +313,7 @@ class CrionicMinerApp {
         this.elements.currentPool.textContent = this.miningStats.currentPool;
         this.elements.poolStatus.textContent = this.miningStats.poolStatus;
         this.elements.poolStatus.className = 'status-' + this.miningStats.poolStatus;
+        this.elements.currentDiff.textContent = this.miningStats.difficulty;
     }
 
     addLog(message) {
@@ -328,23 +323,11 @@ class CrionicMinerApp {
         
         this.elements.miningLog.appendChild(logEntry);
         this.elements.miningLog.scrollTop = this.elements.miningLog.scrollHeight;
-        
-        console.log("CrionicMiner UI: " + message);
     }
 }
 
-// Start the app when page loads
+// Start the app
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("📄 DOM fully loaded, starting Crionic Miner...");
     window.crionicMinerApp = new CrionicMinerApp();
     window.crionicMinerApp.init();
 });
-
-// Fallback initialization
-setTimeout(() => {
-    if (!window.crionicMinerApp) {
-        console.log("🔄 Fallback initialization...");
-        window.crionicMinerApp = new CrionicMinerApp();
-        window.crionicMinerApp.init();
-    }
-}, 1000);
