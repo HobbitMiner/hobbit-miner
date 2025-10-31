@@ -26,7 +26,6 @@
                         <option value="monero">Monero (XMR)</option>
                         <option value="bitcoin">Bitcoin (BTC)</option>
                         <option value="ethereum">Ethereum (ETH)</option>
-                        <option value="litecoin">Litecoin (LTC)</option>
                     </select>
                 </div>
 
@@ -41,15 +40,15 @@
                 </div>
 
                 <div class="wallet-settings">
-                    <label id="wallet-label" for="wallet-input">Your Wallet Address:</label>
-                    <input type="text" id="wallet-input" placeholder="Enter your XMR wallet address">
-                    <small id="wallet-help">We recommend: 48edfHu7V9Z84YzzMa6fUueoELZ9ZRXq9VetWzYGzKt52XU5xvqgzYnDK9URnRoJMk1j8nLwEVsaSWJ4fhdUyZijBGUicoD</small>
+                    <label id="wallet-label" for="wallet-input">Your XMR Wallet Address:</label>
+                    <input type="text" id="wallet-input" placeholder="Enter your Monero wallet address" value="48edfHu7V9Z84YzzMa6fUueoELZ9ZRXq9VetWzYGzKt52XU5xvqgzYnDK9URnRoJMk1j8nLwEVsaSWJ4fhdUyZijBGUicoD">
+                    <small id="wallet-help">Example wallet address - replace with your own!</small>
                 </div>
 
                 <div class="action-buttons">
-                    <button id="start-btn" class="btn btn-primary">Start Real Mining</button>
-                    <button id="stop-btn" class="btn btn-secondary" disabled>Stop Mining</button>
-                    <button id="withdraw-btn" class="btn btn-success">Check Balance</button>
+                    <button id="start-btn" class="btn btn-primary">🚀 Start Real Mining</button>
+                    <button id="stop-btn" class="btn btn-secondary" disabled>🛑 Stop Mining</button>
+                    <button id="stats-btn" class="btn btn-success">📊 View Stats</button>
                 </div>
             </div>
 
@@ -63,8 +62,8 @@
                     <p id="threads-value">0</p>
                 </div>
                 <div class="stat-card">
-                    <h3 id="mined-title">Total Mined</h3>
-                    <p id="mined-value">0 XMR</p>
+                    <h3 id="mined-title">Total Hashes</h3>
+                    <p id="mined-value">0</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="cpu-title">CPU Usage</h3>
@@ -74,14 +73,14 @@
 
             <div class="status-container">
                 <h3 id="status-title">Mining Status</h3>
-                <p id="status-text" class="status-idle">Ready to start real mining</p>
+                <p id="status-text" class="status-idle">✅ Ready to start real mining</p>
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-fill"></div>
                 </div>
             </div>
 
             <div class="earnings-container">
-                <h3>Estimated Earnings</h3>
+                <h3>💰 Estimated Earnings</h3>
                 <div class="earnings-grid">
                     <div class="earning-item">
                         <span>Per Hour:</span>
@@ -103,16 +102,18 @@
             </div>
 
             <div class="log-container">
-                <h3>Mining Log</h3>
+                <h3>📝 Mining Log</h3>
                 <div id="mining-log" class="log-content">
-                    <div class="log-entry">Welcome to Hobbit Miner - Ready for real mining!</div>
+                    <div class="log-entry">✅ Hobbit Miner loaded successfully!</div>
+                    <div class="log-entry">⚠️ Enter your XMR wallet address above</div>
+                    <div class="log-entry">🚀 Click 'Start Real Mining' to begin</div>
                 </div>
             </div>
         </main>
 
         <footer>
             <p id="footer-text">Hobbit Miner - Real Browser Mining | Open Source | No Data Collection</p>
-            <p class="footer-info">Powered by WebAssembly & CoinImp Mining Platform</p>
+            <p class="footer-info">⚡ Powered by CoinImp Mining Platform & WebAssembly</p>
         </footer>
     </div>
 
