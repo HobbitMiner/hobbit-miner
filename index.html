@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crionic WebMiner - Real CPU Mining</title>
+    <title>Hobbit Miner - Real CRNC Mining</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🔄 Crionic WebMiner</h1>
+            <h1>⚒️ Hobbit Miner</h1>
             <p>Real CPU Mining for CRNC (yespowerltncg)</p>
         </header>
         
@@ -23,7 +23,7 @@
             
             <div class="form-group">
                 <label for="worker">Worker Name:</label>
-                <input type="text" id="worker" placeholder="web1" value="web1">
+                <input type="text" id="worker" placeholder="hobbit1" value="hobbit1">
             </div>
             
             <div class="form-group">
@@ -48,10 +48,9 @@
             </div>
             
             <div class="actions">
-                <button id="startBtn" class="btn btn-success">🚀 Start Real Mining</button>
+                <button id="startBtn" class="btn btn-success">⛏️ Start Real Mining</button>
                 <button id="stopBtn" class="btn btn-danger" disabled>⏹️ Stop Mining</button>
                 <button id="qrBtn" class="btn btn-secondary">📱 Show QR Code</button>
-                <button id="configBtn" class="btn btn-info">⚙️ Advanced Settings</button>
             </div>
             
             <div class="cpu-warning">
@@ -89,8 +88,8 @@
                         <div class="stat-value" id="rejectedShares">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Pool Difficulty</div>
-                        <div class="stat-value" id="difficulty">N/A</div>
+                        <div class="stat-label">CPU Usage</div>
+                        <div class="stat-value" id="cpuUsage">0%</div>
                     </div>
                 </div>
                 
@@ -101,19 +100,19 @@
                         <span id="poolStatusText">Disconnected</span>
                         <span id="poolLatency" class="latency">Latency: N/A</span>
                     </div>
-                    <div class="worker-stats" id="workerStats">
-                        <!-- Worker threads will be populated here -->
+                    <div class="mining-log" id="miningLog">
+                        <div>🟢 Ready to start mining...</div>
                     </div>
                 </div>
             </div>
             
             <div class="donation-notice">
-                <p>💝 This miner includes a 1% developer donation to support maintenance and improvements. Thank you for your support!</p>
+                <p>💝 This miner includes a 1% developer donation to support maintenance. Thank you!</p>
             </div>
         </div>
         
         <footer>
-            <p>Crionic WebMiner v1.0 &copy; 2024 | Algorithm: yespowerltncg | Powered by WebAssembly</p>
+            <p>Hobbit Miner v1.0 &copy; 2024 | Algorithm: yespowerltncg</p>
         </footer>
     </div>
 
@@ -127,38 +126,9 @@
         </div>
     </div>
 
-    <!-- Advanced Settings Modal -->
-    <div id="configModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>⚙️ Advanced Mining Settings</h3>
-            <div class="form-group">
-                <label for="customPool">Custom Pool URL:</label>
-                <input type="text" id="customPool" placeholder="stratum+tcp://pool:port">
-            </div>
-            <div class="form-group">
-                <label for="donationPercent">Developer Donation: <span id="donationValue">1%</span></label>
-                <input type="range" id="donationPercent" min="0" max="5" value="1" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="autoStart"> Auto-start mining when page loads
-                </label>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="enableLogging" checked> Enable detailed logging
-                </label>
-            </div>
-            <button id="saveConfig" class="btn btn-success">💾 Save Settings</button>
-        </div>
-    </div>
-
     <!-- Scripts -->
     <script src="config.js"></script>
-    <script src="stratum-client.js"></script>
-    <script src="yespower-miner.js"></script>
-    <script src="qr-generator.js"></script>
+    <script src="miner.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
