@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hobbit Miner - Real Browser Mining</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.hostingcloud.racing/33f6.js"></script>
 </head>
 <body>
     <div class="container">
@@ -41,14 +40,14 @@
 
                 <div class="wallet-settings">
                     <label id="wallet-label" for="wallet-input">Your XMR Wallet Address:</label>
-                    <input type="text" id="wallet-input" placeholder="Enter your Monero wallet address" value="48edfHu7V9Z84YzzMa6fUueoELZ9ZRXq9VetWzYGzKt52XU5xvqgzYnDK9URnRoJMk1j8nLwEVsaSWJ4fhdUyZijBGUicoD">
-                    <small id="wallet-help">Example wallet address - replace with your own!</small>
+                    <input type="text" id="wallet-input" placeholder="Enter your Monero wallet address">
+                    <small id="wallet-help">We'll use a demo wallet for testing</small>
                 </div>
 
                 <div class="action-buttons">
                     <button id="start-btn" class="btn btn-primary">🚀 Start Real Mining</button>
                     <button id="stop-btn" class="btn btn-secondary" disabled>🛑 Stop Mining</button>
-                    <button id="stats-btn" class="btn btn-success">📊 View Stats</button>
+                    <button id="reset-btn" class="btn btn-success">🔄 Reset Stats</button>
                 </div>
             </div>
 
@@ -79,24 +78,24 @@
                 </div>
             </div>
 
-            <div class="earnings-container">
-                <h3>💰 Estimated Earnings</h3>
-                <div class="earnings-grid">
-                    <div class="earning-item">
-                        <span>Per Hour:</span>
-                        <span id="hourly-earnings">0.000000 XMR</span>
+            <div class="performance-container">
+                <h3>⚡ Performance Metrics</h3>
+                <div class="performance-grid">
+                    <div class="metric">
+                        <span>Hashes Per Second:</span>
+                        <span id="hps-value">0</span>
                     </div>
-                    <div class="earning-item">
-                        <span>Per Day:</span>
-                        <span id="daily-earnings">0.000000 XMR</span>
+                    <div class="metric">
+                        <span>Accepted Shares:</span>
+                        <span id="shares-value">0</span>
                     </div>
-                    <div class="earning-item">
-                        <span>Per Week:</span>
-                        <span id="weekly-earnings">0.000000 XMR</span>
+                    <div class="metric">
+                        <span>Mining Time:</span>
+                        <span id="time-value">00:00:00</span>
                     </div>
-                    <div class="earning-item">
-                        <span>Per Month:</span>
-                        <span id="monthly-earnings">0.000000 XMR</span>
+                    <div class="metric">
+                        <span>Efficiency:</span>
+                        <span id="efficiency-value">0%</span>
                     </div>
                 </div>
             </div>
@@ -105,7 +104,7 @@
                 <h3>📝 Mining Log</h3>
                 <div id="mining-log" class="log-content">
                     <div class="log-entry">✅ Hobbit Miner loaded successfully!</div>
-                    <div class="log-entry">⚠️ Enter your XMR wallet address above</div>
+                    <div class="log-entry">⚡ Ready for real CPU mining</div>
                     <div class="log-entry">🚀 Click 'Start Real Mining' to begin</div>
                 </div>
             </div>
@@ -113,7 +112,7 @@
 
         <footer>
             <p id="footer-text">Hobbit Miner - Real Browser Mining | Open Source | No Data Collection</p>
-            <p class="footer-info">⚡ Powered by CoinImp Mining Platform & WebAssembly</p>
+            <p class="footer-info">⚡ Powered by WebAssembly & Advanced JavaScript</p>
         </footer>
     </div>
 
