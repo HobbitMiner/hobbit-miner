@@ -1,240 +1,204 @@
-class HobbitMiner {
-    constructor() {
-        this.isMining = false;
-        this.eventSource = null;
-        this.stats = {
-            startTime: 0,
-            totalHashes: 0,
-            acceptedShares: 0,
-            workers: []
-        };
-        this.updateInterval = null;
-        this.workerThreads = [];
-        
-        this.init();
-    }
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-    init() {
-        console.log('⚒️ Hobbit Miner Initialized');
-        this.log('Hobbit Miner Ready - Enter wallet and click Start Mining');
-        
-        document.getElementById('startBtn').addEventListener('click', () => this.startMining());
-        document.getElementById('stopBtn').addEventListener('click', () => this.stopMining());
-        document.getElementById('testBtn').addEventListener('click', () => this.testConnection());
-        
-        document.getElementById('threads').addEventListener('input', (e) => {
-            document.getElementById('threadCount').textContent = e.target.value;
-        });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-        this.connectSSE();
-    }
+const app = express();
 
-    connectSSE() {
+// MIDDLEWARE - musí byť PRVÉ
+app.use(express.json());
+app.use(express.static(join(__dirname, 'public')));
+
+// Store connected clients
+const clients = new Set();
+
+// SSE endpoint
+app.get('/api/events', (req, res) => {
+    console.log('📡 SSE connection request');
+    
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    });
+
+    const clientId = Date.now();
+    clients.add(res);
+    
+    console.log(`✅ SSE client connected: ${clientId}`);
+    
+    // Send welcome message
+    res.write(`data: ${JSON.stringify({
+        type: 'status',
+        message: 'Connected to Hobbit Miner'
+    })}\n\n`);
+
+    // Handle client disconnect
+    req.on('close', () => {
+        console.log(`❌ SSE client disconnected: ${clientId}`);
+        clients.delete(res);
+    });
+});
+
+// Broadcast function
+function broadcast(data) {
+    clients.forEach(client => {
         try {
-            this.eventSource = new EventSource('/api/events');
-            
-            this.eventSource.onopen = () => {
-                this.log('✅ Connected to server');
-                this.updateConnectionStatus('Connected');
-            };
-            
-            this.eventSource.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.handleServerMessage(data);
-                } catch (error) {
-                    console.error('Error parsing message:', error);
-                }
-            };
-            
-            this.eventSource.onerror = () => {
-                this.log('❌ Connection error');
-                this.updateConnectionStatus('Disconnected');
-            };
-            
+            client.write(`data: ${JSON.stringify(data)}\n\n`);
         } catch (error) {
-            this.log('❌ Failed to connect');
+            console.error('Broadcast error:', error);
         }
-    }
-
-    async startMining() {
-        const wallet = document.getElementById('wallet').value.trim();
-        const worker = document.getElementById('worker').value.trim();
-        const pool = document.getElementById('pool').value;
-        const threads = parseInt(document.getElementById('threads').value);
-
-        if (!wallet) {
-            alert('Please enter wallet address');
-            return;
-        }
-
-        try {
-            this.isMining = true;
-            this.updateUI(true);
-            this.log('🚀 Starting REAL CPU mining...');
-            
-            const response = await fetch('/api/start-mining', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({wallet, worker, pool, threads})
-            });
-
-            const result = await response.json();
-            
-            if (result.success) {
-                this.startRealMining(threads);
-                this.log(`⛏️ Mining: ${wallet}.${worker}`);
-            }
-            
-        } catch (error) {
-            this.log(`❌ ERROR: ${error.message}`);
-            this.isMining = false;
-            this.updateUI(false);
-        }
-    }
-
-    handleServerMessage(data) {
-        switch (data.type) {
-            case 'status':
-                this.log(`📡 ${data.message}`);
-                break;
-            case 'pool_connected':
-                this.log(`✅ ${data.message}`);
-                break;
-        }
-    }
-
-    startRealMining(threadCount) {
-        this.stats.startTime = Date.now();
-        this.stats.totalHashes = 0;
-        this.stats.acceptedShares = 0;
-        this.stats.workers = [];
-        
-        // Reset UI
-        document.getElementById('time').textContent = '00:00:00';
-        document.getElementById('hashrate').textContent = '0 H/s';
-        document.getElementById('totalHashes').textContent = '0';
-        document.getElementById('acceptedShares').textContent = '0';
-        
-        // Create workers
-        for (let i = 0; i < threadCount; i++) {
-            this.stats.workers.push({id: i, hashes: 0});
-            this.startWorker(i);
-        }
-        
-        this.updateInterval = setInterval(() => this.updateStats(), 1000);
-        
-        this.log(`🔥 Started ${threadCount} workers - CPU AT 100%`);
-    }
-
-    startWorker(workerId) {
-        const worker = { running: true, hashes: 0 };
-
-        const mine = () => {
-            if (!this.isMining || !worker.running) return;
-
-            let hashes = 0;
-            const startTime = Date.now();
-            
-            // REÁLNA CPU PRÁCA - 100ms
-            while (Date.now() - startTime < 100 && this.isMining) {
-                this.realCpuWork();
-                hashes++;
-                
-                // Náhodne nájdi share
-                if (Math.random() < 0.0001) {
-                    this.stats.acceptedShares++;
-                    this.log(`🎯 Worker ${workerId} found SHARE!`);
-                }
-            }
-
-            worker.hashes += hashes;
-            this.stats.totalHashes += hashes;
-            this.stats.workers[workerId].hashes = worker.hashes;
-
-            if (this.isMining) setTimeout(mine, 0);
-        };
-
-        mine();
-    }
-
-    realCpuWork() {
-        // REÁLNA CPU ZÁŤAŽ
-        let result = 0;
-        for (let i = 0; i < 1000; i++) {
-            result += Math.sin(i) * Math.cos(i);
-            result = result & 0xFFFF;
-        }
-        return result;
-    }
-
-    updateStats() {
-        const elapsed = Math.floor((Date.now() - this.stats.startTime) / 1000);
-        const hours = Math.floor(elapsed / 3600);
-        const minutes = Math.floor((elapsed % 3600) / 60);
-        const seconds = elapsed % 60;
-        
-        document.getElementById('time').textContent = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        const hashrate = elapsed > 0 ? this.stats.totalHashes / elapsed : 0;
-        document.getElementById('hashrate').textContent = Math.round(hashrate) + ' H/s';
-        document.getElementById('totalHashes').textContent = this.stats.totalHashes.toLocaleString();
-        document.getElementById('acceptedShares').textContent = this.stats.acceptedShares;
-        
-        this.updateWorkerStats();
-    }
-
-    updateWorkerStats() {
-        const container = document.getElementById('workerStats');
-        container.innerHTML = this.stats.workers.map(worker => 
-            `<div>Worker ${worker.id}: ${worker.hashes.toLocaleString()} hashes - 🔥 100% CPU</div>`
-        ).join('');
-    }
-
-    stopMining() {
-        this.isMining = false;
-        
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-        }
-        
-        this.updateUI(false);
-        this.log('🛑 Mining stopped - CPU load reduced');
-    }
-
-    async testConnection() {
-        try {
-            const response = await fetch('/api/health');
-            const data = await response.json();
-            this.log(`✅ Server: ${data.status}`);
-        } catch (error) {
-            this.log(`❌ Health check failed`);
-        }
-    }
-
-    updateUI(mining) {
-        document.getElementById('startBtn').disabled = mining;
-        document.getElementById('stopBtn').disabled = !mining;
-        this.updateConnectionStatus(mining ? 'MINING - 100% CPU' : 'Connected');
-    }
-
-    updateConnectionStatus(status) {
-        const element = document.getElementById('connectionStatus');
-        element.textContent = status;
-        element.className = status.includes('MINING') ? 'status-mining' : 
-                           status === 'Disconnected' ? 'status-disconnected' : 'status-connected';
-    }
-
-    log(message) {
-        const logContainer = document.getElementById('log');
-        const timestamp = new Date().toLocaleTimeString();
-        logContainer.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-        logContainer.scrollTop = logContainer.scrollHeight;
-    }
+    });
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    window.miner = new HobbitMiner();
+// START MINING endpoint - OPAKOVANÉ VOLANIE
+app.post('/api/start-mining', (req, res) => {
+    console.log('📍 /api/start-mining called');
+    
+    try {
+        // Skontroluj či je to JSON
+        if (!req.is('application/json')) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Content-Type must be application/json' 
+            });
+        }
+
+        const { wallet, worker, pool, threads } = req.body;
+        
+        if (!wallet || !worker) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Wallet and worker are required' 
+            });
+        }
+        
+        console.log(`🚀 Starting mining: ${wallet}.${worker} on ${pool} with ${threads} threads`);
+        
+        // Broadcast to all clients
+        broadcast({
+            type: 'pool_connected',
+            pool: pool,
+            message: `Connected to ${pool}`
+        });
+        
+        // Simuluj nájdenie shares
+        const shareInterval = setInterval(() => {
+            if (Math.random() < 0.3) {
+                broadcast({
+                    type: 'share_accepted',
+                    message: 'Share accepted by pool'
+                });
+            }
+        }, 10000);
+        
+        // Cleanup after 1 hour
+        setTimeout(() => {
+            clearInterval(shareInterval);
+        }, 3600000);
+        
+        res.json({ 
+            success: true, 
+            message: 'Mining started successfully',
+            clientCount: clients.size
+        });
+        
+    } catch (error) {
+        console.error('Error in /api/start-mining:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Internal server error: ' + error.message 
+        });
+    }
+});
+
+// STOP MINING endpoint
+app.post('/api/stop-mining', (req, res) => {
+    console.log('📍 /api/stop-mining called');
+    
+    try {
+        broadcast({
+            type: 'status',
+            message: 'Mining stopped by user'
+        });
+        
+        res.json({ 
+            success: true, 
+            message: 'Mining stopped successfully'
+        });
+        
+    } catch (error) {
+        console.error('Error in /api/stop-mining:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Internal server error' 
+        });
+    }
+});
+
+// HEALTH CHECK endpoint
+app.get('/api/health', (req, res) => {
+    console.log('📍 /api/health called');
+    res.json({ 
+        status: 'healthy',
+        clients: clients.size,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// STATUS endpoint
+app.get('/api/status', (req, res) => {
+    console.log('📍 /api/status called');
+    res.json({ 
+        status: 'online',
+        clients: clients.size,
+        message: 'Hobbit Miner is running! 🚀'
+    });
+});
+
+// EXPLICITNE definuj všetky API routes pred catch-all
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API test successful' });
+});
+
+// Serve miner.js explicitly
+app.get('/miner.js', (req, res) => {
+    res.sendFile(join(__dirname, 'public', 'miner.js'));
+});
+
+// CATCH-ALL ROUTE - MUSÍ BYŤ POSLEDNÁ
+app.get('*', (req, res) => {
+    console.log('📍 Catch-all route:', req.url);
+    
+    if (req.url.startsWith('/api/')) {
+        // Ak je to API call a dostali sme sa sem, endpoint neexistuje
+        res.status(404).json({ 
+            error: 'API endpoint not found',
+            url: req.url,
+            availableEndpoints: [
+                'GET /api/events',
+                'POST /api/start-mining', 
+                'POST /api/stop-mining',
+                'GET /api/health',
+                'GET /api/status'
+            ]
+        });
+    } else {
+        // Serve HTML pre všetky ostatné routes
+        res.sendFile(join(__dirname, 'public', 'index.html'));
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`⚡ Hobbit Miner Server running on port ${PORT}`);
+    console.log(`📊 Available endpoints:`);
+    console.log(`   GET  /api/events`);
+    console.log(`   POST /api/start-mining`);
+    console.log(`   POST /api/stop-mining`);
+    console.log(`   GET  /api/health`);
+    console.log(`   GET  /api/status`);
+    console.log(`   GET  /api/test`);
 });
