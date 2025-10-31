@@ -34,6 +34,11 @@
                     <input type="range" id="thread-slider" min="1" max="8" value="4" class="slider">
                 </div>
 
+                <div class="intensity-control">
+                    <label id="intensity-label">Mining Intensity: <span id="intensity-value">50</span>%</label>
+                    <input type="range" id="intensity-slider" min="10" max="100" value="50" class="slider">
+                </div>
+
                 <div class="pool-settings">
                     <label id="pool-label" for="pool-input">Mining Pool:</label>
                     <input type="text" id="pool-input" value="pool.minexmr.com:4444" placeholder="pool.minexmr.com:4444">
@@ -63,20 +68,31 @@
                     <h3 id="mined-title">Total Mined</h3>
                     <p id="mined-value">0</p>
                 </div>
+                <div class="stat-card">
+                    <h3 id="cpu-title">CPU Usage</h3>
+                    <p id="cpu-value">0%</p>
+                </div>
             </div>
 
             <div class="status-container">
                 <h3 id="status-title">Mining Status</h3>
                 <p id="status-text" class="status-idle">Ready to start mining</p>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="log-container">
+                <h3>Mining Log</h3>
+                <div id="mining-log" class="log-content"></div>
             </div>
         </main>
 
         <footer>
-            <p id="footer-text">Hobbit Miner - Open Source Browser Mining Tool</p>
+            <p id="footer-text">Hobbit Miner - Open Source Browser Mining Tool | No data collection</p>
         </footer>
     </div>
 
-    <!-- WebAssembly Mining Script -->
     <script src="miner.js"></script>
     <script src="app.js"></script>
 </body>
