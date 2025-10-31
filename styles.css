@@ -65,7 +65,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-.crypto-selector, .thread-control, .pool-settings, .wallet-settings {
+.crypto-selector, .thread-control, .intensity-control, .pool-settings, .wallet-settings {
     margin-bottom: 20px;
 }
 
@@ -189,6 +189,7 @@ select, input[type="text"] {
     padding: 10px;
     border-radius: 5px;
     font-weight: 600;
+    margin-bottom: 15px;
 }
 
 .status-idle {
@@ -204,6 +205,50 @@ select, input[type="text"] {
 .status-error {
     background: rgba(244, 67, 54, 0.2);
     color: #f44336;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #1a2a3a;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.log-container {
+    background: rgba(45, 74, 92, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.log-container h3 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.log-content {
+    height: 150px;
+    overflow-y: auto;
+    background: #1a2a3a;
+    padding: 15px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-left: 3px solid #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
 }
 
 footer {
