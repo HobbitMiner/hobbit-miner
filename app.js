@@ -21,7 +21,7 @@ class CrionicMinerApp {
                 intensityLabel: "Mining Intensity:",
                 startBtn: "START MINING",
                 stopBtn: "STOP MINING",
-                statsBtn: "POOL STATS",
+                resetBtn: "RESET",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Active Threads",
                 sharesTitle: "Accepted Shares",
@@ -29,7 +29,7 @@ class CrionicMinerApp {
                 statusTitle: "Mining Status",
                 statusIdle: "Ready to mine Crionic",
                 statusMining: "Mining Crionic...",
-                poolTitle: "Current Pool",
+                poolTitle: "Pool Information",
                 footerText: "Crionic Miner - yespowerLTNCG CPU Mining | Open Source"
             },
             sk: {
@@ -40,7 +40,7 @@ class CrionicMinerApp {
                 intensityLabel: "Intenzita ťažby:",
                 startBtn: "SPUSTIŤ ŤAŽBU",
                 stopBtn: "ZASTAVIŤ ŤAŽBU",
-                statsBtn: "ŠTATISTIKY POOLU",
+                resetBtn: "RESET",
                 hashrateTitle: "Hashrate",
                 threadsTitle: "Aktívne vlákna",
                 sharesTitle: "Akceptované share",
@@ -48,7 +48,7 @@ class CrionicMinerApp {
                 statusTitle: "Stav ťažby",
                 statusIdle: "Pripravené na ťažbu Crionic",
                 statusMining: "Ťažba Crionic...",
-                poolTitle: "Aktuálny Pool",
+                poolTitle: "Informácie o poole",
                 footerText: "Crionic Miner - yespowerLTNCG CPU Ťažba | Open Source"
             },
             ru: {
@@ -59,7 +59,7 @@ class CrionicMinerApp {
                 intensityLabel: "Интенсивность майнинга:",
                 startBtn: "НАЧАТЬ МАЙНИНГ",
                 stopBtn: "ОСТАНОВИТЬ МАЙНИНГ",
-                statsBtn: "СТАТИСТИКА ПУЛА",
+                resetBtn: "СБРОС",
                 hashrateTitle: "Хешрейт",
                 threadsTitle: "Активные потоки",
                 sharesTitle: "Принятые шары",
@@ -67,25 +67,27 @@ class CrionicMinerApp {
                 statusTitle: "Статус майнинга",
                 statusIdle: "Готов к майнингу Crionic",
                 statusMining: "Майнинг Crionic...",
-                poolTitle: "Текущий пул",
+                poolTitle: "Информация о пуле",
                 footerText: "Crionic Miner - yespowerLTNCG CPU Майнинг | Открытый код"
             }
         };
     }
 
     init() {
-        console.log("Starting Crionic Miner...");
+        console.log("🚀 Initializing Crionic Miner App...");
         this.cacheDomElements();
         this.initLanguage();
         this.initEventListeners();
         this.initMinerConnection();
         this.updateDisplay();
         
-        this.addLog("Crionic Miner ready! Algorithm: yespowerLTNCG");
+        this.addLog("✅ Crionic Miner App initialized successfully!");
+        this.addLog("⚡ Algorithm: yespowerLTNCG - Ready for CPU mining");
     }
 
     cacheDomElements() {
         this.elements = {
+            // Text elements
             title: document.getElementById('title'),
             poolLabel: document.getElementById('pool-label'),
             walletLabel: document.getElementById('wallet-label'),
@@ -93,7 +95,7 @@ class CrionicMinerApp {
             intensityLabel: document.getElementById('intensity-label'),
             startBtn: document.getElementById('start-btn'),
             stopBtn: document.getElementById('stop-btn'),
-            statsBtn: document.getElementById('stats-btn'),
+            resetBtn: document.getElementById('reset-btn'),
             hashrateTitle: document.getElementById('hashrate-title'),
             threadsTitle: document.getElementById('threads-title'),
             sharesTitle: document.getElementById('shares-title'),
@@ -101,16 +103,22 @@ class CrionicMinerApp {
             statusTitle: document.getElementById('status-title'),
             statusText: document.getElementById('status-text'),
             footerText: document.getElementById('footer-text'),
+            
+            // Value elements
             threadValue: document.getElementById('thread-value'),
             intensityValue: document.getElementById('intensity-value'),
             hashrateValue: document.getElementById('hashrate-value'),
             threadsValue: document.getElementById('threads-value'),
             sharesValue: document.getElementById('shares-value'),
             cpuValue: document.getElementById('cpu-value'),
+            
+            // Input elements
             threadSlider: document.getElementById('thread-slider'),
             intensitySlider: document.getElementById('intensity-slider'),
             poolSelect: document.getElementById('pool-select'),
             walletInput: document.getElementById('wallet-input'),
+            
+            // UI elements
             progressFill: document.getElementById('progress-fill'),
             miningLog: document.getElementById('mining-log'),
             currentPool: document.getElementById('current-pool'),
@@ -159,7 +167,7 @@ class CrionicMinerApp {
         this.elements.intensityLabel.textContent = t.intensityLabel;
         this.elements.startBtn.textContent = t.startBtn;
         this.elements.stopBtn.textContent = t.stopBtn;
-        this.elements.statsBtn.textContent = t.statsBtn;
+        this.elements.resetBtn.textContent = t.resetBtn;
         this.elements.hashrateTitle.textContent = t.hashrateTitle;
         this.elements.threadsTitle.textContent = t.threadsTitle;
         this.elements.sharesTitle.textContent = t.sharesTitle;
@@ -176,6 +184,7 @@ class CrionicMinerApp {
     }
 
     initEventListeners() {
+        // Thread slider
         this.elements.threadSlider.addEventListener('input', (e) => {
             const threads = parseInt(e.target.value);
             this.elements.threadValue.textContent = threads;
@@ -185,6 +194,7 @@ class CrionicMinerApp {
             }
         });
         
+        // Intensity slider
         this.elements.intensitySlider.addEventListener('input', (e) => {
             const intensity = parseInt(e.target.value);
             this.elements.intensityValue.textContent = intensity;
@@ -194,39 +204,50 @@ class CrionicMinerApp {
             }
         });
         
+        // START MINING button - FIXED!
         this.elements.startBtn.addEventListener('click', () => {
+            console.log("🎯 START MINING button clicked!");
             this.startMining();
         });
         
+        // STOP MINING button
         this.elements.stopBtn.addEventListener('click', () => {
+            console.log("🛑 STOP MINING button clicked!");
             this.stopMining();
         });
         
-        this.elements.statsBtn.addEventListener('click', () => {
-            this.showPoolStats();
+        // RESET button
+        this.elements.resetBtn.addEventListener('click', () => {
+            this.resetStats();
+        });
+
+        // Pool selection
+        this.elements.poolSelect.addEventListener('change', (e) => {
+            this.miningStats.currentPool = e.target.value;
+            this.updateDisplay();
+            this.addLog("🏊 Pool changed to: " + e.target.value);
         });
     }
 
     initMinerConnection() {
         window.updateMinerStats = (stats) => this.updateMinerStats(stats);
         window.addMiningLog = (message) => this.addMiningLog(message);
+        
+        console.log("✅ Miner connection initialized");
     }
 
     startMining() {
-        const pool = this.elements.poolSelect.value;
-        const wallet = this.elements.walletInput.value.trim();
+        console.log("🚀 Starting Crionic mining process...");
+        
         const threads = parseInt(this.elements.threadSlider.value);
         const intensity = parseInt(this.elements.intensitySlider.value);
+        const pool = this.elements.poolSelect.value;
 
-        if (!wallet) {
-            this.addLog("ERROR: Please enter Crionic wallet address!");
-            return;
-        }
-
-        this.addLog("Starting Crionic mining on " + pool + "...");
+        this.addLog("🔧 Starting with " + threads + " threads at " + intensity + "% intensity");
+        this.addLog("🏊 Pool: " + pool);
 
         try {
-            const success = window.crionicMiner.start(pool, wallet, threads, intensity);
+            const success = window.crionicMiner.start(threads, intensity);
             
             if (success) {
                 this.isMining = true;
@@ -234,14 +255,24 @@ class CrionicMinerApp {
                 this.elements.stopBtn.disabled = false;
                 this.elements.statusText.textContent = this.translations[this.currentLanguage].statusMining;
                 this.elements.statusText.className = 'status-text status-mining';
+                
+                this.miningStats.currentPool = pool;
+                this.updateDisplay();
+                
+                this.addLog("✅ Mining started successfully!");
+            } else {
+                this.addLog("❌ Failed to start mining!");
             }
             
         } catch (error) {
-            this.addLog("Error: " + error.message);
+            this.addLog("💥 Error starting miner: " + error.message);
+            console.error("Start Mining Error:", error);
         }
     }
 
     stopMining() {
+        console.log("🛑 Stopping mining...");
+        
         if (window.crionicMiner) {
             window.crionicMiner.stop();
         }
@@ -252,22 +283,21 @@ class CrionicMinerApp {
         this.elements.statusText.textContent = this.translations[this.currentLanguage].statusIdle;
         this.elements.statusText.className = 'status-text status-idle';
         
-        this.addLog("Mining stopped");
+        this.addLog("🛑 Mining stopped");
     }
 
-    showPoolStats() {
-        if (window.crionicMiner) {
-            const poolStats = window.crionicMiner.getPoolStats();
-            const currentPool = this.elements.poolSelect.value;
-            const stats = poolStats[currentPool];
-            
-            if (stats) {
-                this.addLog("Pool " + currentPool + " stats:");
-                this.addLog("  Workers: " + stats.workers);
-                this.addLog("  Hashrate: " + stats.hashrate);
-                this.addLog("  Blocks: " + stats.blocks);
-            }
-        }
+    resetStats() {
+        this.miningStats = {
+            hashrate: 0,
+            threads: 4,
+            totalHashes: 0,
+            acceptedHashes: 0,
+            cpuUsage: 75,
+            poolStatus: 'disconnected',
+            currentPool: this.elements.poolSelect.value
+        };
+        this.updateDisplay();
+        this.addLog("🔄 Statistics reset");
     }
 
     updateMinerStats(stats) {
@@ -276,16 +306,17 @@ class CrionicMinerApp {
     }
 
     updateDisplay() {
+        // Update statistics
         this.elements.hashrateValue.textContent = this.miningStats.hashrate.toLocaleString() + " H/s";
         this.elements.threadsValue.textContent = this.miningStats.threads;
         this.elements.sharesValue.textContent = this.miningStats.acceptedHashes;
         this.elements.cpuValue.textContent = this.miningStats.cpuUsage + "%";
         
+        // Update progress bar
         this.elements.progressFill.style.width = this.miningStats.cpuUsage + "%";
         
+        // Update pool information
         this.elements.currentPool.textContent = this.miningStats.currentPool;
-        
-        // Update pool status
         this.elements.poolStatus.textContent = this.miningStats.poolStatus;
         this.elements.poolStatus.className = 'status-' + this.miningStats.poolStatus;
     }
@@ -297,11 +328,23 @@ class CrionicMinerApp {
         
         this.elements.miningLog.appendChild(logEntry);
         this.elements.miningLog.scrollTop = this.elements.miningLog.scrollHeight;
+        
+        console.log("CrionicMiner UI: " + message);
     }
 }
 
-// Start the app
+// Start the app when page loads
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("📄 DOM fully loaded, starting Crionic Miner...");
     window.crionicMinerApp = new CrionicMinerApp();
     window.crionicMinerApp.init();
 });
+
+// Fallback initialization
+setTimeout(() => {
+    if (!window.crionicMinerApp) {
+        console.log("🔄 Fallback initialization...");
+        window.crionicMinerApp = new CrionicMinerApp();
+        window.crionicMinerApp.init();
+    }
+}, 1000);
